@@ -1,0 +1,106 @@
+import React, { useContext } from 'react';
+import { Clock, MapPin, Tag, ArrowRight, CheckCircle2, User, Radio } from 'lucide-react';
+import { AppContext } from '../context/AppContext';
+import { getSessionCountdown } from '../utils/sessionUtils';
+import './SessionCard.css';
+
+const SessionCard = ({ session, isAlternate }) => {
+  const { userAgenda, rsvpToSession, setActiveDrawerSession } = useContext(AppContext);
+
+  const isSaved = userAgenda.some(s => s.id === session.id);
+  const countdown = getSessionCountdown(session.time);
+
+  const getStatusBadge = (status) => {
+    switch(status) {
+      case 'Full':
+        return <span className="badge badge-danger">Full</span>;
+      case 'Filling Fast':
+        return <span className="badge badge-warning">Filling Fast</span>;
+      default:
+        return <span className="badge badge-success">Open</span>;
+    }
+  };
+
+  const handleRSVP = (e) => {
+    e.stopPropagation();
+    rsvpToSession(session);
+  };
+
+  return (
+    <div
+      className={`session-card card ${isAlternate ? 'session-alternate' : ''}`}
+      onClick={() => setActiveDrawerSession(session.id)}
+    >
+      {isAlternate && (
+        <div className="alternate-badge-header">
+          <span className="badge badge-ai">Smart Reroute Recommendation</span>
+        </div>
+      )}
+
+      <div className="session-header flex-between">
+        <h4 className="session-title">{session.title}</h4>
+        {getStatusBadge(session.status)}
+      </div>
+
+      {/* Speaker info */}
+      {session.speaker && (
+        <div className="session-speaker">
+          <User size={13} className="text-tertiary" />
+          <span className="text-sm text-secondary">{session.speaker}</span>
+          {session.speakerRole && (
+            <span className="text-xs text-tertiary"> · {session.speakerRole}</span>
+          )}
+        </div>
+      )}
+
+      {/* Speaker bio preview */}
+      {session.speakerBio && (
+        <p className="session-bio text-sm text-tertiary">{session.speakerBio}</p>
+      )}
+
+      <div className="session-info">
+        <div className="info-row">
+          <Clock size={16} />
+          <span>{session.time}{session.duration ? ` · ${session.duration}` : ''}</span>
+          {countdown && (
+            <span className={`countdown-badge countdown-${countdown.status}`}>
+              {countdown.status === 'live' && <Radio size={9} />}
+              {countdown.label}
+            </span>
+          )}
+        </div>
+        <div className="info-row">
+          <MapPin size={16} />
+          <span>{session.location}</span>
+        </div>
+      </div>
+
+      <div className="session-tags">
+        <Tag size={14} className="tag-icon" />
+        {session.tags.map(tag => (
+          <span key={tag} className="session-tag">{tag}</span>
+        ))}
+      </div>
+
+      <div className="session-actions mt-4 flex gap-4">
+        {isSaved ? (
+          <button className="btn btn-secondary flex-1" disabled onClick={(e) => e.stopPropagation()}>
+            <CheckCircle2 size={16} className="text-success" /> Saved
+          </button>
+        ) : (
+          <button className="btn btn-primary flex-1" onClick={handleRSVP}>
+            {session.status === 'Full' ? 'Join Waitlist' : 'RSVP'}
+          </button>
+        )}
+        <button className="btn btn-outline" onClick={(e) => {
+          e.stopPropagation();
+          setActiveDrawerSession(session.id);
+        }}>
+          Details <ArrowRight size={16} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default SessionCard;
