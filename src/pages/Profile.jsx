@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import {
   Edit3, Check, X, ShieldCheck, Link2, Mail, Building2,
   BookOpen, Clock, Users, CalendarDays, BarChart2, Sparkles,
-  Globe, Briefcase, Target, Zap
+  Globe, Briefcase, Target, Zap, RotateCcw
 } from 'lucide-react';
 import './Profile.css';
 
@@ -73,7 +73,7 @@ const SelectionPills = ({ label, helper, max, values, presets, onChange }) => (
 );
 
 const Profile = () => {
-  const { currentUser, updateUser, userAgenda, networkRoster } = useContext(AppContext);
+  const { currentUser, updateUser, userAgenda, networkRoster, resetApp } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');

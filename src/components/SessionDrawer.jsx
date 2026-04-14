@@ -1,16 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users } from 'lucide-react';
+import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen } from 'lucide-react';
 import './SessionDrawer.css';
 
 const SessionDrawer = ({ sessionId, onClose }) => {
-  const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser } = useContext(AppContext);
+  const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser, getSessionNote, saveSessionNote } = useContext(AppContext);
   const [session, setSession] = useState(null);
   const [showWhyPanel, setShowWhyPanel] = useState(false);
+  const [noteText, setNoteText] = useState('');
 
   useEffect(() => {
     if (sessionId) {
-      setSession(sessions.find(s => s.id === sessionId));
+      const s = sessions.find(s => s.id === sessionId);
+      setSession(s);
+      if (s) setNoteText(getSessionNote(s.id));
     }
   }, [sessionId, sessions]);
 
@@ -114,7 +117,32 @@ const SessionDrawer = ({ sessionId, onClose }) => {
             </div>
           )}
 
-          <div className="drawer-section mt-8 mb-20">
+          <div className="drawer-section mt-6 mb-4">
+            <h4 className="flex items-center gap-2 text-sm text-secondary mb-2">
+              <NotebookPen size={14} /> Quick Notes
+            </h4>
+            <textarea
+              className="notes-textarea"
+              placeholder="Jot down anything about this session — questions to ask, key takeaways, action items…"
+              value={noteText}
+              onChange={e => setNoteText(e.target.value)}
+              rows={3}
+            />
+            <button
+              className="btn btn-secondary btn-sm mt-2"
+              style={{ fontSize: '0.75rem' }}
+              onClick={() => saveSessionNote(session.id, noteText)}
+            >
+              Save Note
+            </button>
+            {getSessionNote(session.id) && (
+              <p className="text-xs text-tertiary mt-1">
+                ✓ Note saved — persists across sessions.
+              </p>
+            )}
+          </div>
+
+          <div className="drawer-section mt-4 mb-20">
              <h4 className="text-sm text-secondary mb-2">Tags</h4>
              <div className="pill-group">
                 {session.tags.map(tag => <span key={tag} className="badge badge-outline">{tag}</span>)}

@@ -11,6 +11,8 @@ const PRESET_SKILLS = ['Python', 'React', 'TensorFlow', 'Product Strategy', 'Fig
 const Onboarding = () => {
   const navigate = useNavigate();
   const { completeOnboarding } = useContext(AppContext);
+  const [currentStep, setCurrentStep] = useState(1);
+  const TOTAL_STEPS = 3;
   
   const [formData, setFormData] = useState({
     name: '',
@@ -52,6 +54,13 @@ const Onboarding = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Update step based on form scroll / section filled
+  const getCompletedStep = () => {
+    if (formData.skills.length > 0 || formData.interests.length > 0 || formData.goals.length > 0) return 2;
+    if (formData.name && formData.role) return 1;
+    return 0;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -75,7 +84,25 @@ const Onboarding = () => {
             <Sparkles size={32} className="text-accent-primary" style={{color: 'var(--accent-primary)'}} />
           </div>
           <h1 className="mb-2">Set Up Your <span className="gradient-text-accent">Event Profile</span></h1>
-          <p className="text-secondary mb-8">Tell your AI concierge who you are so it can find the right people and sessions for you.</p>
+          <p className="text-secondary mb-6">Tell your AI concierge who you are so it can find the right people and sessions for you.</p>
+
+          {/* Step progress bar */}
+          <div className="onboarding-steps">
+            {['About You', 'Preferences', 'Availability'].map((label, i) => {
+              const stepNum = i + 1;
+              const done = getCompletedStep() >= stepNum;
+              const active = getCompletedStep() + 1 === stepNum;
+              return (
+                <div key={label} className="ob-step">
+                  <div className={`ob-step-dot ${done ? 'done' : ''} ${active ? 'active' : ''}`}>
+                    {done ? <CheckCircle2 size={12} /> : stepNum}
+                  </div>
+                  <span className={`ob-step-label ${done ? 'done' : ''}`}>{label}</span>
+                  {i < 2 && <div className={`ob-step-line ${done ? 'done' : ''}`}></div>}
+                </div>
+              );
+            })}
+          </div>
         </div>
 
         <form onSubmit={handleSubmit} className="onboarding-form flex-col gap-8">

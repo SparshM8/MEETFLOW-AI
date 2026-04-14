@@ -1,71 +1,144 @@
 import React, { createContext, useState, useEffect } from 'react';
 import { sessions as initialSessions, attendees } from '../data/mockData';
 import { getRecommendedAgenda, getAlternativeSession } from '../utils/agenda';
+import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 
 export const AppContext = createContext();
 
-export const AppProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [sessions, setSessions] = useState(initialSessions);
-  
-  const [recommendedAgenda, setRecommendedAgenda] = useState([]);
-  const [userAgenda, setUserAgenda] = useState([]);
-  const [waitlist, setWaitlist] = useState([]);
-  const [rerouteAlert, setRerouteAlert] = useState(null);
-  
-  // V3 Networking State
-  const [networkRoster, setNetworkRoster] = useState([]); // Array of { matchId, status: 'requested' | 'saved' | 'connected' }
+/* ── localStorage helpers ───────────────── */
+const STORAGE_KEY = 'meetflow_v1';
 
-  // V3 Global Drawer State
+const loadState = () => {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch {
+    return {};
+  }
+};
+
+const saveState = (state) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch {
+    // Ignore storage errors (private browsing, etc.)
+  }
+};
+
+/* ── Toast Component ────────────────────── */
+const TOAST_ICONS = {
+  success: <CheckCircle2 size={15} />,
+  warning: <AlertTriangle size={15} />,
+  info: <Info size={15} />,
+};
+
+const Toast = ({ toasts, removeToast }) => (
+  <div className="toast-stack">
+    {toasts.map(t => (
+      <div
+        key={t.id}
+        className={`global-toast toast-${t.type} animate-slide-down`}
+        onClick={() => removeToast(t.id)}
+      >
+        <span className={`toast-icon toast-icon-${t.type}`}>
+          {TOAST_ICONS[t.type]}
+        </span>
+        <span className="toast-text">{t.message}</span>
+        <button className="toast-close"><X size={12} /></button>
+      </div>
+    ))}
+  </div>
+);
+
+/* ── Provider ───────────────────────────── */
+export const AppProvider = ({ children }) => {
+  const saved = loadState();
+
+  const [currentUser, setCurrentUser] = useState(saved.currentUser || null);
+  const [sessions, setSessions] = useState(initialSessions);
+  const [recommendedAgenda, setRecommendedAgenda] = useState([]);
+  const [userAgenda, setUserAgenda] = useState(saved.userAgenda || []);
+  const [waitlist, setWaitlist] = useState(saved.waitlist || []);
+  const [rerouteAlert, setRerouteAlert] = useState(null);
+  const [networkRoster, setNetworkRoster] = useState(saved.networkRoster || []);
+  const [sessionNotes, setSessionNotes] = useState(saved.sessionNotes || {}); // { sessionId: "note text" }
+
   const [activeDrawerSession, setActiveDrawerSession] = useState(null);
   const [activeConnectionMatch, setActiveConnectionMatch] = useState(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  // Typed toasts: [{ id, message, type }]
+  const [toasts, setToasts] = useState([]);
+  // Legacy single toast (so components using toastMessage still work)
   const [toastMessage, setToastMessage] = useState('');
 
-  const showToast = (message) => {
+  /* ── Persistence: save on every relevant state change ── */
+  useEffect(() => {
+    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes });
+  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes]);
+
+  /* ── Toast helpers ── */
+  const showToast = (message, type = 'success') => {
+    const id = Date.now();
+    setToasts(prev => [...prev.slice(-3), { id, message, type }]); // max 4 toasts
+    setTimeout(() => removeToast(id), 3500);
+    // Also set legacy for any component still reading toastMessage
     setToastMessage(message);
-    setTimeout(() => setToastMessage(''), 3000);
+    setTimeout(() => setToastMessage(''), 3500);
   };
 
+  const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
+
+  /* ── Notes ── */
+  const saveSessionNote = (sessionId, note) => {
+    setSessionNotes(prev => ({ ...prev, [sessionId]: note }));
+    showToast('Note saved', 'success');
+  };
+
+  const getSessionNote = (sessionId) => sessionNotes[sessionId] || '';
+
+  /* ── Recommended Agenda ── */
   useEffect(() => {
-    if (currentUser && currentUser.name) {
-      const rec = getRecommendedAgenda(currentUser, sessions);
-      setRecommendedAgenda(rec);
+    if (currentUser?.name) {
+      setRecommendedAgenda(getRecommendedAgenda(currentUser, sessions));
     }
   }, [currentUser]);
 
+  /* ── Smart Rerouting ── */
   useEffect(() => {
     if (currentUser && recommendedAgenda.length > 0 && !rerouteAlert) {
       const timer = setTimeout(() => {
         const sessionToFill = recommendedAgenda.find(s => s.status !== 'Full') || recommendedAgenda[0];
         if (sessionToFill) {
-          const updatedSessions = sessions.map(s => 
+          const updated = sessions.map(s =>
             s.id === sessionToFill.id ? { ...s, status: 'Full' } : s
           );
-          setSessions(updatedSessions);
-          const alt = getAlternativeSession(sessionToFill, currentUser, updatedSessions);
-          if (alt) {
-            setRerouteAlert({ originalSession: sessionToFill, newSession: alt });
-          }
+          setSessions(updated);
+          const alt = getAlternativeSession(sessionToFill, currentUser, updated);
+          if (alt) setRerouteAlert({ originalSession: sessionToFill, newSession: alt });
         }
-      }, 15000); 
+      }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [currentUser, recommendedAgenda]); 
+  }, [currentUser, recommendedAgenda]);
 
+  /* ── Actions ── */
   const acceptReroute = () => {
     if (rerouteAlert) {
-      const newRec = recommendedAgenda.map(s => 
-        s.id === rerouteAlert.originalSession.id ? { ...rerouteAlert.newSession, isAlternate: true } : s
+      const newRec = recommendedAgenda.map(s =>
+        s.id === rerouteAlert.originalSession.id
+          ? { ...rerouteAlert.newSession, isAlternate: true }
+          : s
       );
       setRecommendedAgenda(newRec);
-      
       if (userAgenda.find(s => s.id === rerouteAlert.originalSession.id)) {
-        setUserAgenda(prev => [...prev.filter(s => s.id !== rerouteAlert.originalSession.id), { ...rerouteAlert.newSession, isAlternate: true }]);
-        showToast(`Agenda Rerouted to ${rerouteAlert.newSession.title}`);
+        setUserAgenda(prev => [
+          ...prev.filter(s => s.id !== rerouteAlert.originalSession.id),
+          { ...rerouteAlert.newSession, isAlternate: true }
+        ]);
+        showToast(`Rerouted to: ${rerouteAlert.newSession.title}`, 'info');
       } else {
-        showToast(`Recommendation refined dynamically!`);
+        showToast('Recommendation refreshed!', 'info');
       }
       setRerouteAlert(null);
     }
@@ -73,58 +146,70 @@ export const AppProvider = ({ children }) => {
 
   const dismissReroute = () => setRerouteAlert(null);
 
-  const completeOnboarding = (userData) => setCurrentUser(userData);
+  const completeOnboarding = (userData) => {
+    setCurrentUser(userData);
+    showToast(`Welcome, ${userData.name.split(' ')[0]}! Your event plan is ready.`, 'success');
+  };
 
   const updateUser = (newData) => {
     setCurrentUser(newData);
-    showToast('Profile updated successfully!');
+    showToast('Profile updated successfully!', 'success');
   };
 
   const rsvpToSession = (session) => {
     if (session.status === 'Full') {
       if (!waitlist.find(s => s.id === session.id)) {
-        setWaitlist([...waitlist, session]);
-        showToast('Added to Waitlist');
+        setWaitlist(prev => [...prev, session]);
+        showToast(`Added to waitlist: ${session.title}`, 'warning');
       }
     } else {
       if (!userAgenda.find(s => s.id === session.id)) {
-        setUserAgenda([...userAgenda, session]);
-        showToast('RSVP Confirmed');
+        setUserAgenda(prev => [...prev, session]);
+        showToast(`RSVP confirmed: ${session.title}`, 'success');
       }
     }
   };
 
   const removeFromAgenda = (sessionId) => {
-    setUserAgenda(userAgenda.filter(s => s.id !== sessionId));
-    setWaitlist(waitlist.filter(s => s.id !== sessionId));
-    showToast('Removed from Agenda');
+    setUserAgenda(prev => prev.filter(s => s.id !== sessionId));
+    setWaitlist(prev => prev.filter(s => s.id !== sessionId));
+    showToast('Removed from agenda', 'info');
   };
 
-  // V3 Networking Logic
   const handleNetworkingState = (matchId, status) => {
     const existing = networkRoster.find(n => n.matchId === matchId);
     if (existing) {
-       setNetworkRoster(networkRoster.map(n => n.matchId === matchId ? { ...n, status } : n));
+      setNetworkRoster(prev => prev.map(n => n.matchId === matchId ? { ...n, status } : n));
     } else {
-       setNetworkRoster([...networkRoster, { matchId, status }]);
+      setNetworkRoster(prev => [...prev, { matchId, status }]);
     }
-    const messageMap = {
-      'requested': 'Intro Request Sent',
-      'saved': 'Contact Saved to Roster',
-      'connected': 'Connection Established'
+    const msgMap = {
+      requested: 'Intro request sent!',
+      saved: 'Saved to your network roster',
+      connected: 'Connection established!',
     };
-    showToast(messageMap[status] || 'Networking Roster Updated');
+    showToast(msgMap[status] || 'Network updated', status === 'requested' ? 'success' : 'info');
+  };
+
+  /* ── Reset (for testing) ── */
+  const resetApp = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    window.location.href = '/';
   };
 
   return (
     <AppContext.Provider value={{
-      currentUser, attendees, sessions, recommendedAgenda, userAgenda, waitlist, rerouteAlert,
-      networkRoster, toastMessage, activeDrawerSession, setActiveDrawerSession,
-      activeConnectionMatch, setActiveConnectionMatch, isSidebarOpen, setIsSidebarOpen,
-      completeOnboarding, updateUser, acceptReroute, dismissReroute, rsvpToSession, removeFromAgenda, handleNetworkingState
+      currentUser, attendees, sessions, recommendedAgenda, userAgenda, waitlist,
+      rerouteAlert, networkRoster, toastMessage,
+      sessionNotes, saveSessionNote, getSessionNote,
+      activeDrawerSession, setActiveDrawerSession,
+      activeConnectionMatch, setActiveConnectionMatch,
+      isSidebarOpen, setIsSidebarOpen,
+      completeOnboarding, updateUser, acceptReroute, dismissReroute,
+      rsvpToSession, removeFromAgenda, handleNetworkingState, resetApp,
     }}>
       {children}
-      {toastMessage && <div className="global-toast animate-slide-down">{toastMessage}</div>}
+      <Toast toasts={toasts} removeToast={removeToast} />
     </AppContext.Provider>
   );
 };

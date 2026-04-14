@@ -327,32 +327,70 @@ button {
   background: rgba(255,255,255,0.2);
 }
 
-/* Global Toast */
-.global-toast {
+/* ─── Toast Stack ──────────────────────────────── */
+.toast-stack {
   position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  background: var(--bg-secondary);
-  color: white;
-  padding: 1rem 1.5rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--glass-border-strong);
-  box-shadow: var(--shadow-lg), var(--shadow-glow);
+  bottom: 1.75rem;
+  right: 1.75rem;
   z-index: 9999;
-  font-weight: 500;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-end;
+  pointer-events: none;
 }
 
-.global-toast::before {
-  content: '✓';
+.global-toast {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 22px; height: 22px;
-  background: var(--success);
-  border-radius: 50%;
-  font-size: 13px;
-  color: black;
+  gap: 0.65rem;
+  padding: 0.75rem 1.1rem 0.75rem 0.85rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.85rem;
+  font-weight: 500;
+  max-width: 340px;
+  pointer-events: auto;
+  cursor: pointer;
 }
+
+.toast-success {
+  background: rgba(16,185,129,0.1);
+  border-color: rgba(16,185,129,0.3);
+  color: var(--text-primary);
+}
+.toast-warning {
+  background: rgba(245,158,11,0.1);
+  border-color: rgba(245,158,11,0.3);
+  color: var(--text-primary);
+}
+.toast-info {
+  background: rgba(99,102,241,0.1);
+  border-color: rgba(99,102,241,0.3);
+  color: var(--text-primary);
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+.toast-icon-success { color: var(--success); }
+.toast-icon-warning { color: var(--warning); }
+.toast-icon-info    { color: var(--accent-primary); }
+
+.toast-text { flex: 1; line-height: 1.4; }
+
+.toast-close {
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 0.1rem;
+  flex-shrink: 0;
+}
+.toast-close:hover { color: var(--text-primary); }
+
