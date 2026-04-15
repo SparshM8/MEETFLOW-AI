@@ -1,85 +1,97 @@
-# MeetFlow AI
+# MeetFlow AI ✦
 
-MeetFlow AI is your AI-powered event concierge.
-Build a personalized event plan, meet the right people, and adapt in real time as things change.
+<div align="center">
+  <img src="landingpage.png" alt="MeetFlow AI Landing Page" width="100%" />
+  
+  <p>
+    <strong>The AI-Powered Event Concierge</strong><br />
+    Find the right people, attend the right sessions, and adapt in real-time as plans change.
+  </p>
 
-## Problem and Solution
+  <p>
+    <img src="https://img.shields.io/badge/React-19-blue?logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/Vite-6-purple?logo=vite" alt="Vite" />
+    <img src="https://img.shields.io/badge/AI--Powered-Matched-orange?logo=google-gemini" alt="AI Powered" />
+    <img src="https://img.shields.io/badge/Design-Premium%20Dark-black" alt="Design" />
+  </p>
+</div>
 
-Problem: Attendees waste time deciding what to attend and who to meet.
+---
 
-Solution: MeetFlow AI reads skills, interests, and goals, then builds and updates a personalized schedule with networking recommendations.
+## 💡 The Problem
 
-## Core Features
+Conferences and hackathons are overwhelming. Attendees waste hours scrolling through generic directories and rigid schedules, often missing high-value connections and critical sessions because "the room was full" or "I didn't know they were here."
 
-- Smart onboarding for skills, interests, goals, and availability
-- AI-generated agenda with session and networking suggestions
-- My Agenda experience with RSVP and calendar export
-- Reroute suggestions when sessions are full or plans change
-- Match details with explainable fit signals and AI-generated outreach drafts
+## 🚀 The Solution: MeetFlow AI
 
-## AI and Prompt Strategy
+MeetFlow AI acts as your **personal concierge**. It doesn't just show you a list; it reasons about your skills, interests, and goals to build a dynamic, living agenda that evolves with the event.
 
-The app currently uses a deterministic AI mock service in [src/services/aiService.js](src/services/aiService.js), designed as a direct swap target for Gemini.
+---
 
-Prompt inputs are designed to include:
+## 🔥 Key Features
 
-- Attendee profile (skills, interests, goals, availability)
-- Event/session metadata
-- Match context and recommendation constraints
+### 🕸️ Neural Networking Map
+A custom SVG-based visualization of your social graph. High-value matches orbit your profile, with connection lines weighted and animated by compatibility score.
 
-Gemini prompt objectives (planned integration):
+### 🚨 Waitlist Promotion Simulator
+Experience real-time event reactivity. Our simulation engine demonstrates how MeetFlow AI instantly promotes you from a waitlist to a confirmed seat when capacity opens up.
 
-- Pick best sessions
-- Justify each recommendation
-- Suggest 2-3 high-value connections
-- Propose reroutes when constraints change (full session, overlap, preference shift)
+### 🔀 Context-Aware Rerouting
+When a session fills up or your interests shift, the concierge recalculates your next best move, ensuring you stay productive instead of stranded.
 
-## Implementation Plan
+### 🔍 Explainable AI (XAI)
+We don't just give you a "Match Score." We show you the **Signals**—Shared Skills, Complementary Goals, and Industry Alignment—so you know *exactly* why you should connect.
 
-- Problem and goal: Busy tech events make it hard to find the right people and sessions; MeetFlow AI acts as an AI concierge that plans and adapts schedules in real time.
-- Core flow implemented: onboarding captures skills/interests/goals/availability, generates a personalized plan, shows recommendations on dashboard, and reroutes when sessions become unavailable.
-- Tech stack (MVP in this repo): React + Vite frontend with local mock data and a Gemini-ready AI service layer.
-- Target production stack: React UI, Node.js/Express APIs, MongoDB for attendee/event data, Gemini API for reasoning and recommendations.
-- Done vs next: End-to-end MVP (onboarding -> plan -> agenda -> reroute) is done; next is deeper networking graph intelligence, richer recommendation explanations, and multi-event templates.
+### 💬 Global AI Concierge FAB
+A floating intelligent assistant available on every page. Ask questions about the schedule or get networking icebreakers drafted instantly.
 
-## Tech Stack and Setup
+### 🗓️ Universal Calendar Sync
+Export any session as a `.ics` file to keep your Google, Apple, or Outlook calendars in sync with your MeetFlow agenda.
 
-Current repository stack:
+---
 
-- Frontend: React 19 + Vite
-- Routing: React Router
-- Styling: CSS
-- State: React Context
-- Data: Local mock data
-- AI layer: Gemini-ready mock service
+## 🛠️ Tech Stack
 
-### Local Setup
+- **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Styling**: Vanilla CSS (Custom Glassmorphism Design System)
+- **State**: React Context API with LocalStorage Persistence
+- **AI Layer**: Gemini-Ready deterministic reasoning engine (`aiService.js`)
 
+---
+
+## 📦 Setup & Run
+
+### Prerequisites
+- Node.js (v18+)
+- npm or yarn
+
+### Installation
 ```bash
+# 1. Clone the repository
 git clone https://github.com/SparshM8/MEETFLOW-AI.git
+
+# 2. Enter directory
 cd MEETFLOW-AI
+
+# 3. Install dependencies
 npm install
+
+# 4. Start the development server
 npm run dev
 ```
 
-Optional quality checks:
+Open [http://localhost:5173](http://localhost:5173) to see the experience.
 
-```bash
-npm run lint
-npm run build
-```
+---
 
-Open http://localhost:5173.
+## 🏆 Submission Context
+**Built for PromptWars Virtual — Hack2skill x Google for Developers**
 
-### Environment Variables (for future backend/AI integration)
+MeetFlow AI is an MVP submitted as part of a prompt engineering and AI integration challenge. It demonstrates how structured data and LLM-ready heuristics can transform a static directory into an agentic event experience.
 
-When Node/Express + MongoDB + Gemini are connected, expected variables include:
+---
 
-- MONGODB_URI
-- GEMINI_API_KEY
-
-## Project Status
-
-This is a PromptWars hackathon MVP focused on intelligent event matchmaking and adaptive scheduling, not a production product.
-
-It is currently frontend-first with mock data and Gemini-ready integration points.
+<div align="center">
+  <sub>Built with ❤️ for the future of networking.</sub>
+</div>
