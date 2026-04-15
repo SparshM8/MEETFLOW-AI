@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen, CalendarClock } from 'lucide-react';
 import { generateICS } from '../utils/calendar';
@@ -8,13 +8,15 @@ const SessionDrawer = ({ sessionId, onClose }) => {
   const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser, getSessionNote, saveSessionNote } = useContext(AppContext);
   const [showWhyPanel, setShowWhyPanel] = useState(false);
   const [noteDrafts, setNoteDrafts] = useState({});
+  const drawerRef = useRef(null);
+  const triggerRef = useRef(null);
 
   const session = useMemo(
     () => (sessionId ? sessions.find(s => s.id === sessionId) || null : null),
     [sessionId, sessions]
   );
 
-  // Handle escape key to close
+  // Handle keyboard close while drawer is open.
   useEffect(() => {
     const handleEsc = (e) => {
       if (e.key === 'Escape') onClose();
@@ -22,6 +24,20 @@ const SessionDrawer = ({ sessionId, onClose }) => {
     window.addEventListener('keydown', handleEsc);
     return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
+
+  useEffect(() => {
+    if (!session) return;
+
+    triggerRef.current = document.activeElement;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    drawerRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      triggerRef.current?.focus?.();
+    };
+  }, [session]);
 
   if (!session) return null;
 
@@ -32,19 +48,26 @@ const SessionDrawer = ({ sessionId, onClose }) => {
 
   return (
     <>
-      <div className="drawer-overlay animate-fade-in" onClick={onClose}></div>
-      <div className="session-drawer animate-slide-left">
+      <div className="drawer-overlay animate-fade-in" onClick={onClose} aria-hidden="true"></div>
+      <div
+        ref={drawerRef}
+        className="session-drawer animate-slide-left"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="session-drawer-title"
+        tabIndex={-1}
+      >
         <div className="drawer-header flex-between border-b pb-4">
           <div className="flex items-center gap-3">
              <div className="badge badge-ai">{session.type || 'Session'}</div>
              {session.status === 'Full' && <span className="badge badge-danger">Capacity Reached</span>}
              {session.status === 'Filling Fast' && <span className="badge badge-warning">Filling Fast</span>}
           </div>
-          <button className="drawer-close" onClick={onClose}><X size={20}/></button>
+          <button type="button" className="drawer-close" onClick={onClose} aria-label="Close session details"><X size={20}/></button>
         </div>
 
         <div className="drawer-content">
-          <h1 className="text-xl text-primary font-semibold mt-4 line-clamp-2">{session.title}</h1>
+          <h1 id="session-drawer-title" className="text-xl text-primary font-semibold mt-4 line-clamp-2">{session.title}</h1>
           
           <div className="drawer-meta mt-4 flex gap-6 text-sm text-secondary">
             <div className="flex items-center gap-1"><Clock size={16} className="text-accent-primary"/> <span>{session.time} ({session.duration})</span></div>
@@ -83,8 +106,11 @@ const SessionDrawer = ({ sessionId, onClose }) => {
           {session.whyRecommended && (
             <div className="drawer-section mt-6">
               <button
+                type="button"
                 className="why-session-toggle"
                 onClick={() => setShowWhyPanel(v => !v)}
+                aria-expanded={showWhyPanel}
+                aria-controls="why-session-panel"
               >
                 <Sparkles size={13} />
                 <span>Why this session for you?</span>
@@ -92,7 +118,7 @@ const SessionDrawer = ({ sessionId, onClose }) => {
               </button>
 
               {showWhyPanel && (
-                <div className="why-session-panel animate-fade-in">
+                <div id="why-session-panel" className="why-session-panel animate-fade-in">
                   <p className="why-session-reason">{session.whyRecommended}</p>
                   <div className="why-session-signals">
                     {currentUser?.interests?.some(i => session.tags.some(t => t.toLowerCase().includes(i.toLowerCase()))) && (
@@ -128,6 +154,7 @@ const SessionDrawer = ({ sessionId, onClose }) => {
               rows={3}
             />
             <button
+              type="button"
               className="btn btn-secondary btn-sm mt-2"
               style={{ fontSize: '0.75rem' }}
               onClick={() => {
@@ -160,24 +187,25 @@ const SessionDrawer = ({ sessionId, onClose }) => {
             {isRSVPd ? (
               <div className="flex gap-4 items-center">
                  <div className="flex items-center gap-2 text-success font-medium flex-1"><CheckCircle2 size={20}/> RSVP Confirmed</div>
-                 <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar"><CalendarClock size={16} /></button>
-                 <button className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Unsave</button>
+                 <button type="button" className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar" aria-label="Add session to calendar"><CalendarClock size={16} /></button>
+                 <button type="button" className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Unsave</button>
               </div>
             ) : isWaitlisted ? (
               <div className="flex gap-4 items-center">
                  <div className="flex items-center gap-2 text-warning font-medium flex-1"><AlertCircle size={20}/> On Waitlist</div>
-                 <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar"><CalendarClock size={16} /></button>
-                 <button className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Leave Waitlist</button>
+                 <button type="button" className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar" aria-label="Add session to calendar"><CalendarClock size={16} /></button>
+                 <button type="button" className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Leave Waitlist</button>
               </div>
             ) : (
               <div className="flex gap-2 w-full">
                 <button 
+                  type="button"
                   className={`btn btn-primary flex-1 ${session.status === 'Full' ? 'btn-waitlist' : ''}`}
                   onClick={() => rsvpToSession(session)}
                 >
                   {session.status === 'Full' ? 'Join Waitlist' : 'RSVP to Session'}
                 </button>
-                <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar">
+                <button type="button" className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar" aria-label="Add session to calendar">
                    <CalendarClock size={16} />
                 </button>
               </div>

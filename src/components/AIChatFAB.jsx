@@ -51,20 +51,22 @@ const AIChatFAB = () => {
   return (
     <>
       <button 
+        type="button"
         className={`ai-fab-button ${isOpen ? 'hidden' : 'animate-bounce-in'}`}
         onClick={() => setIsOpen(true)}
+        aria-label="Open AI concierge chat"
       >
         <Sparkles size={24} className="text-white" />
       </button>
 
       {isOpen && (
-        <div className="ai-chat-drawer animate-slide-up">
+        <div className="ai-chat-drawer animate-slide-up" role="dialog" aria-label="AI concierge chat panel" aria-modal="false">
           <div className="ai-chat-header">
             <div className="flex items-center gap-2">
               <div className="ai-avatar-small"><Sparkles size={14} /></div>
               <h3 className="text-sm font-semibold text-white">Event Concierge</h3>
             </div>
-            <button onClick={() => setIsOpen(false)} className="text-tertiary hover:text-white transition-colors">
+            <button type="button" onClick={() => setIsOpen(false)} className="text-tertiary hover:text-white transition-colors" aria-label="Close AI concierge chat">
               <X size={18} />
             </button>
           </div>
@@ -95,8 +97,9 @@ const AIChatFAB = () => {
               value={inputValue}
               onChange={e => setInputValue(e.target.value)}
               className="ai-chat-input"
+              aria-label="Chat message input"
             />
-            <button type="submit" disabled={!inputValue.trim()} className="ai-chat-send">
+            <button type="submit" disabled={!inputValue.trim()} className="ai-chat-send" aria-label="Send message">
               <Send size={16} />
             </button>
           </form>

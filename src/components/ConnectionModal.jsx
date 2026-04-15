@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useContext, useEffect, useRef, useState } from 'react';
 import { X, Sparkles, Send, BookmarkPlus, Loader2, UserPlus, RefreshCcw } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { generateIcebreaker, generateReasonToConnect } from '../services/aiService';
@@ -10,24 +10,52 @@ const ConnectionModal = ({ match, onClose }) => {
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(true);
   const [regenLoading, setRegenLoading] = useState(false);
+  const modalRef = useRef(null);
+  const triggerRef = useRef(null);
 
   // Check current status
   const existingConnection = networkRoster.find(n => n.matchId === match.id);
   const status = existingConnection ? existingConnection.status : null;
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchAI = async () => {
       setLoading(true);
       const [genReason, genIcebreaker] = await Promise.all([
         generateReasonToConnect(currentUser, match, match.matchDetails),
         generateIcebreaker(currentUser, match, match.matchDetails)
       ]);
+      if (cancelled) return;
       setReason(genReason);
       setIcebreaker(genIcebreaker);
       setLoading(false);
     };
     fetchAI();
+
+    return () => {
+      cancelled = true;
+    };
   }, [currentUser, match]);
+
+  useEffect(() => {
+    triggerRef.current = document.activeElement;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    modalRef.current?.focus();
+
+    const handleEsc = (e) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleEsc);
+      triggerRef.current?.focus?.();
+    };
+  }, [onClose]);
 
   const handleRegenerate = async () => {
     setRegenLoading(true);
@@ -42,9 +70,17 @@ const ConnectionModal = ({ match, onClose }) => {
   };
 
   return (
-    <div className="connection-overlay animate-fade-in" onClick={onClose}>
-      <div className="connection-modal card-elevated animate-slide-down modal-flex-container" onClick={e => e.stopPropagation()}>
-        <button className="close-btn" onClick={onClose}><X size={20}/></button>
+    <div className="connection-overlay animate-fade-in" onClick={onClose} aria-hidden="true">
+      <div
+        ref={modalRef}
+        className="connection-modal card-elevated animate-slide-down modal-flex-container"
+        onClick={e => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="connection-modal-title"
+        tabIndex={-1}
+      >
+        <button type="button" className="close-btn" onClick={onClose} aria-label="Close connection modal"><X size={20}/></button>
 
         <div className="modal-header border-b pb-4 mb-4 flex-shrink-0">
           <div className="flex items-center gap-4">
@@ -52,7 +88,7 @@ const ConnectionModal = ({ match, onClose }) => {
                {match.name.charAt(0)}
             </div>
             <div>
-              <h2 className="text-xl text-primary">{match.name}</h2>
+              <h2 id="connection-modal-title" className="text-xl text-primary">{match.name}</h2>
               <p className="text-secondary">{match.headline}</p>
               <p className="text-sm text-tertiary mt-1">{match.role} at {match.company}</p>
             </div>
@@ -84,10 +120,12 @@ const ConnectionModal = ({ match, onClose }) => {
              <div className="flex-between mb-2">
                <h4 className="text-sm text-secondary">Drafted Introduction</h4>
                <button 
+                 type="button"
                  className="btn-icon text-tertiary hover:text-primary transition-all" 
                  title="Regenerate"
                  onClick={handleRegenerate}
                  disabled={regenLoading}
+                 aria-label="Regenerate introduction message"
                >
                   <RefreshCcw size={14} className={regenLoading ? 'animate-spin' : ''}/>
                </button>
@@ -108,12 +146,12 @@ const ConnectionModal = ({ match, onClose }) => {
              <button className="btn btn-secondary w-full" disabled>Request Sent</button>
           ) : status === 'saved' ? (
              <>
-               <button className="btn btn-secondary flex-1" onClick={() => handleAction('requested')}><Send size={16}/> Connect Now</button>
+               <button type="button" className="btn btn-secondary flex-1" onClick={() => handleAction('requested')}><Send size={16}/> Connect Now</button>
              </>
           ) : (
              <>
-               <button className="btn btn-outline flex-1" onClick={() => handleAction('saved')}><BookmarkPlus size={16}/> Save Contact</button>
-               <button className="btn btn-primary flex-1" onClick={() => handleAction('requested')}><UserPlus size={16}/> Send Request</button>
+               <button type="button" className="btn btn-outline flex-1" onClick={() => handleAction('saved')}><BookmarkPlus size={16}/> Save Contact</button>
+               <button type="button" className="btn btn-primary flex-1" onClick={() => handleAction('requested')}><UserPlus size={16}/> Send Request</button>
              </>
           )}
         </div>
