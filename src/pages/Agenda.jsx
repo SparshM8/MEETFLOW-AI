@@ -2,6 +2,7 @@ import React, { useContext, useState, useMemo } from 'react';
 import { CalendarDays, GitMerge, Filter, AlertTriangle, CheckCircle2, Clock, Info } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import SessionCard from '../components/SessionCard';
+import VenueMap from '../components/VenueMap';
 import { detectConflicts } from '../utils/sessionUtils';
 import './Agenda.css';
 
@@ -126,54 +127,62 @@ const Agenda = () => {
         )}
       </div>
 
-      {/* ── Timeline ── */}
-      <div className="timeline-container">
-        {displayedSessions.map((session, index) => (
-          <div
-            key={session.id}
-            className={`timeline-item animate-fade-in ${conflictIds.has(session.id) ? 'timeline-item-conflict' : ''}`}
-            style={{ animationDelay: `${index * 80}ms` }}
-          >
-            <div className="timeline-marker">
-              <div className={`timeline-dot ${
-                userAgenda.find(s => s.id === session.id)
-                  ? conflictIds.has(session.id) ? 'dot-conflict' : 'dot-confirmed'
-                  : ''
-              }`}></div>
-              {index < displayedSessions.length - 1 && <div className="timeline-line"></div>}
-            </div>
-
-            <div className="timeline-content">
-              {session.isAlternate && (
-                <div className="reroute-indicator">
-                  <GitMerge size={13} />
-                  <span>AI Rerouted — Better Alternative</span>
+      {/* ── Main Layout (Map + Timeline) ── */}
+      <div className="agenda-grid-layout">
+        <div className="agenda-timeline-view">
+          <div className="timeline-container">
+            {displayedSessions.map((session, index) => (
+              <div
+                key={session.id}
+                className={`timeline-item animate-fade-in ${conflictIds.has(session.id) ? 'timeline-item-conflict' : ''}`}
+                style={{ animationDelay: `${index * 80}ms` }}
+              >
+                <div className="timeline-marker">
+                  <div className={`timeline-dot ${
+                    userAgenda.find(s => s.id === session.id)
+                      ? conflictIds.has(session.id) ? 'dot-conflict' : 'dot-confirmed'
+                      : ''
+                  }`}></div>
+                  {index < displayedSessions.length - 1 && <div className="timeline-line"></div>}
                 </div>
-              )}
-              {conflictIds.has(session.id) && (
-                <div className="conflict-indicator">
-                  <AlertTriangle size={13} />
-                  <span>Time overlap with another saved session</span>
-                </div>
-              )}
-              <SessionCard session={session} isAlternate={session.isAlternate} />
-            </div>
-          </div>
-        ))}
 
-        {displayedSessions.length === 0 && (
-          <div className="empty-state card text-center">
-            <CalendarDays size={36} className="text-tertiary mx-auto mb-3" />
-            <h3 className="text-primary">
-              {filter === 'All' ? 'No sessions in your agenda yet' : `No ${filter.toLowerCase()} sessions`}
-            </h3>
-            <p className="text-secondary text-sm mt-2">
-              {filter === 'All'
-                ? 'Go to the Dashboard and RSVP to sessions to build your schedule.'
-                : 'Adjust the filter above to see other sessions.'}
-            </p>
+                <div className="timeline-content">
+                  {session.isAlternate && (
+                    <div className="reroute-indicator">
+                      <GitMerge size={13} />
+                      <span>AI Rerouted — Better Alternative</span>
+                    </div>
+                  )}
+                  {conflictIds.has(session.id) && (
+                    <div className="conflict-indicator">
+                      <AlertTriangle size={13} />
+                      <span>Time overlap with another saved session</span>
+                    </div>
+                  )}
+                  <SessionCard session={session} isAlternate={session.isAlternate} />
+                </div>
+              </div>
+            ))}
+
+            {displayedSessions.length === 0 && (
+              <div className="empty-state card text-center">
+                <CalendarDays size={36} className="text-tertiary mx-auto mb-3" />
+                <h3 className="text-primary">
+                  {filter === 'All' ? 'No sessions in your agenda yet' : `No ${filter.toLowerCase()} sessions`}
+                </h3>
+                <p className="text-secondary text-sm mt-2">
+                  {filter === 'All'
+                    ? 'Go to the Dashboard and RSVP to sessions to build your schedule.'
+                    : 'Adjust the filter above to see other sessions.'}
+                </p>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+
+        <aside className="agenda-map-aside">
+          <VenueMap />
+        </aside>
       </div>
     </div>
   );

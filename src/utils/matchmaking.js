@@ -50,11 +50,20 @@ export const getMatchScore = (userA, userB) => {
     matchingGoals = [...new Set(matchingGoals)];
   }
 
+  // Calculate normalized percentages for breakdown (Total 100)
+  const totalRaw = score;
+  const breakDown = {
+    interests: totalRaw > 0 ? Math.round(((sharedInterests.length * 10) / totalRaw) * 100) : 0,
+    skills: totalRaw > 0 ? Math.round(((sharedSkills.length * 10) / totalRaw) * 100) : 0,
+    goals: totalRaw > 0 ? Math.round((score - (sharedInterests.length * 10 + sharedSkills.length * 10)) / totalRaw * 100) : 0
+  };
+
   return {
     score: score > 100 ? 100 : score, // Normalize roughly to 100
     sharedInterests,
     sharedSkills,
-    matchingGoals
+    matchingGoals,
+    breakDown
   };
 };
 

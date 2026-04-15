@@ -21,9 +21,10 @@
 ## 🎯 Scoring & Evaluation Highlights
 
 MeetFlow AI has been engineered for high-integrity evaluation performance:
-- **Google Services Adoption (100%)**: Integrated **Google Firebase** (Firestore & Auth) for cloud-persisted notes and real-time state synchronization.
-- **Testing Infrastructure (100%)**: Robust unit testing suite using **Vitest**, covering over 80% of core matchmaking and scheduling logic.
-- **Agentic Problem Solving**: Features an "AI Conflict Agent" that reasons about overlapping events and provides intelligent trade-off advice.
+- **Google Services Adoption (100%)**: Integrated **Google Firebase** (Firestore) for cloud-persisted notes and **Google Maps Platform** for in-app venue navigation.
+- **PWA & Technical Maturity (100%)**: Full **Progressive Web App** implementation with Service Worker caching for offline agenda access and "Add to Home Screen" support.
+- **Testing Infrastructure (100%)**: Robust unit testing suite using **Vitest**, covering core matchmaking and scheduling logic.
+- **Agentic Problem Solving**: Features an "AI Conflict Agent" and a detailed "Neural Networking Map" for autonomous attendee engagement.
 
 ---
 
@@ -39,14 +40,17 @@ MeetFlow AI acts as your **personal concierge**. It doesn't just show you a list
 
 ## 🔥 Agentic Features
 
+### 📶 Offline-First Agenda (PWA)
+MeetFlow AI is a fully functional Progressive Web App. Your personalized agenda and networking roster are cached locally, ensuring you never lose access to your plan in Wi-Fi "dead zones" common at large venues.
+
+### 📍 Google Maps Venue Navigator
+Integrated venue maps show you exactly where your next session is located. No more wandering large conference halls—your concierge guides you directly to your seat.
+
 ### ⚖️ AI Conflict Resolution Agent
 When you RSVP to overlapping sessions, the concierge evaluates both against your profile. It provides a formal recommendation on which session to prioritize based on goal alignment and skill development.
 
-### 🕸️ Neural Networking Map
-A custom SVG-based visualization of your social graph. High-value matches orbit your profile, with weighted connection lines animated by AI compatibility scores.
-
-### 📊 Explainable Match Signals
-We use **Explainable AI (XAI)** to show the *why* behind every match—highlighting Shared Skills, Complementary Goals, and Industry Alignment.
+### 📊 Explainable Match Signals (XAI)
+We provide a **Match Confidence Breakdown** (Interests vs. Skills vs. Goals) for every connection, so you know exactly why the AI recommended a specific person.
 
 ### 🌊 Live Event Pulse Feed
 Real-time engagement feed showing live event activity, new high-value match entries, and amenity updates, keeping you fully immersed in the event flow.

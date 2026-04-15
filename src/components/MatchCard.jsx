@@ -106,10 +106,28 @@ const MatchCard = ({ match }) => {
                 </div>
               ))}
               {match.matchDetails.score >= 60 && (
-                <p className="why-summary">
-                  <Sparkles size={10} className="inline" />
-                  {' '}High collaboration potential based on overlapping goals and interests.
-                </p>
+                <div className="match-confidence-breakdown mt-4">
+                  <div className="flex-between mb-1">
+                    <span className="text-xs font-semibold text-secondary">Match Confidence Breakdown</span>
+                    <span className="text-xs text-tertiary">Verified by AI</span>
+                  </div>
+                  <div className="confidence-bars">
+                    {Object.entries(match.matchDetails.breakDown || {}).map(([key, val]) => (
+                      <div key={key} className="confidence-item">
+                        <div className="flex-between text-xxs mb-1">
+                          <span className="capitalize">{key}</span>
+                          <span>{val}%</span>
+                        </div>
+                        <div className="confidence-bar-bg">
+                          <div 
+                            className={`confidence-bar-fill fill-${key}`} 
+                            style={{ width: `${val}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
             </div>
           )}

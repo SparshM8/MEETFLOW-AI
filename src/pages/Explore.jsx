@@ -208,16 +208,23 @@ const Explore = () => {
   const [activeInterest, setActiveInterest] = useState(null);
   const [activeExp, setActiveExp] = useState(null);
   const [activeAvail, setActiveAvail] = useState(null);
+  const [activeRole, setActiveRole] = useState(null);
+  const [activeCompany, setActiveCompany] = useState(null);
   const [sortBy, setSortBy] = useState('match'); // 'match' | 'name' | 'exp'
   const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'graph'
 
-  const hasFilters = activeSkill || activeInterest || activeExp || activeAvail;
+  const FILTER_ROLES = useMemo(() => [...new Set(attendees.map(a => a.role).filter(Boolean))].slice(0, 6), [attendees]);
+  const FILTER_COMPANIES = useMemo(() => [...new Set(attendees.map(a => a.company).filter(Boolean))].slice(0, 6), [attendees]);
+
+  const hasFilters = activeSkill || activeInterest || activeExp || activeAvail || activeRole || activeCompany;
 
   const clearFilters = () => {
     setActiveSkill(null);
     setActiveInterest(null);
     setActiveExp(null);
     setActiveAvail(null);
+    setActiveRole(null);
+    setActiveCompany(null);
   };
 
   const enriched = useMemo(() => {
@@ -241,7 +248,9 @@ const Explore = () => {
       const matchesInt = !activeInterest || a.interests?.includes(activeInterest);
       const matchesExp = !activeExp || a.experienceLevel === activeExp;
       const matchesAvail = !activeAvail || a.availability === activeAvail;
-      return matchesQ && matchesSkill && matchesInt && matchesExp && matchesAvail;
+      const matchesRole = !activeRole || a.role === activeRole;
+      const matchesComp = !activeCompany || a.company === activeCompany;
+      return matchesQ && matchesSkill && matchesInt && matchesExp && matchesAvail && matchesRole && matchesComp;
     });
 
     if (sortBy === 'match') list = list.sort((a, b) => b.score - a.score);
@@ -358,6 +367,28 @@ const Explore = () => {
                   <button key={a} className={`filter-chip ${activeAvail === a ? 'active' : ''}`}
                     onClick={() => setActiveAvail(activeAvail === a ? null : a)}>
                     {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="filter-group">
+              <p className="filter-group-label"><Briefcase size={11} /> Role</p>
+              <div className="filter-chips">
+                {FILTER_ROLES.map(r => (
+                  <button key={r} className={`filter-chip ${activeRole === r ? 'active' : ''}`}
+                    onClick={() => setActiveRole(activeRole === r ? null : r)}>
+                    {r}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div className="filter-group">
+              <p className="filter-group-label"><Building2 size={11} /> Company</p>
+              <div className="filter-chips">
+                {FILTER_COMPANIES.map(c => (
+                  <button key={c} className={`filter-chip ${activeCompany === c ? 'active' : ''}`}
+                    onClick={() => setActiveCompany(activeCompany === c ? null : c)}>
+                    {c}
                   </button>
                 ))}
               </div>
