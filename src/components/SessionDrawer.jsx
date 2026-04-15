@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../context/AppContext';
-import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen } from 'lucide-react';
+import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen, CalendarClock } from 'lucide-react';
+import { generateICS } from '../utils/calendar';
 import './SessionDrawer.css';
 
 const SessionDrawer = ({ sessionId, onClose }) => {
@@ -154,20 +155,27 @@ const SessionDrawer = ({ sessionId, onClose }) => {
             {isRSVPd ? (
               <div className="flex gap-4 items-center">
                  <div className="flex items-center gap-2 text-success font-medium flex-1"><CheckCircle2 size={20}/> RSVP Confirmed</div>
+                 <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar"><CalendarClock size={16} /></button>
                  <button className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Unsave</button>
               </div>
             ) : isWaitlisted ? (
               <div className="flex gap-4 items-center">
                  <div className="flex items-center gap-2 text-warning font-medium flex-1"><AlertCircle size={20}/> On Waitlist</div>
+                 <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar"><CalendarClock size={16} /></button>
                  <button className="btn btn-outline" onClick={() => removeFromAgenda(session.id)}>Leave Waitlist</button>
               </div>
             ) : (
-              <button 
-                className={`btn btn-primary w-full ${session.status === 'Full' ? 'btn-waitlist' : ''}`}
-                onClick={() => rsvpToSession(session)}
-              >
-                {session.status === 'Full' ? 'Join Waitlist' : 'RSVP to Session'}
-              </button>
+              <div className="flex gap-2 w-full">
+                <button 
+                  className={`btn btn-primary flex-1 ${session.status === 'Full' ? 'btn-waitlist' : ''}`}
+                  onClick={() => rsvpToSession(session)}
+                >
+                  {session.status === 'Full' ? 'Join Waitlist' : 'RSVP to Session'}
+                </button>
+                <button className="btn btn-outline" onClick={() => generateICS(session)} title="Add to Calendar">
+                   <CalendarClock size={16} />
+                </button>
+              </div>
             )}
         </div>
       </div>

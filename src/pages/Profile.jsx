@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import {
   Edit3, Check, X, ShieldCheck, Link2, Mail, Building2,
   BookOpen, Clock, Users, CalendarDays, BarChart2, Sparkles,
-  Globe, Briefcase, Target, Zap, RotateCcw
+  Globe, Briefcase, Target, Zap, RotateCcw, QrCode
 } from 'lucide-react';
 import './Profile.css';
 
@@ -244,6 +244,21 @@ const Profile = () => {
                   <span className="text-sm text-tertiary">{currentUser.company || 'No company listed'}</span>
                 </div>
               </div>
+            </div>
+
+            {/* Digital Badge QR Card */}
+            <div className="card profile-qr-card mt-4 text-center">
+              <h3 className="text-primary font-medium mb-1"><QrCode size={16} className="inline mr-1 text-accent-primary" /> Event Badge</h3>
+              <p className="text-xs text-tertiary mb-3">Scan to swap details instantly</p>
+              
+              <div className="qr-box mx-auto">
+                {/* CSS placeholder for QR code */}
+                <div className="qr-corners"></div>
+                <div className="qr-pattern"></div>
+                <div className="qr-center-logo"><Sparkles size={16} className="text-accent-primary" /></div>
+              </div>
+              
+              <p className="text-xs text-secondary mt-3 font-mono">{currentUser.name.toUpperCase().replace(/\s+/g, '')}-MF26</p>
             </div>
           </div>
 

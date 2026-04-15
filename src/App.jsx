@@ -12,6 +12,7 @@ import Agenda from './pages/Agenda';
 import MatchDetails from './pages/MatchDetails';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
+import AIChatFAB from './components/AIChatFAB';
 
 import './App.css';
 
@@ -75,6 +76,7 @@ const MainLayout = ({ children }) => {
           onClose={() => setActiveConnectionMatch(null)}
         />
       )}
+      <AIChatFAB />
     </div>
   );
 };
