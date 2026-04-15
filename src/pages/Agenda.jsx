@@ -33,7 +33,7 @@ const ConflictBanner = ({ conflicts }) => {
 };
 
 const Agenda = () => {
-  const { userAgenda, recommendedAgenda, waitlist } = useContext(AppContext);
+  const { userAgenda, recommendedAgenda, waitlist, simulateWaitlistPromotion } = useContext(AppContext);
   const [filter, setFilter] = useState('All');
 
   const conflicts = useMemo(() => detectConflicts(userAgenda), [userAgenda]);
@@ -114,6 +114,16 @@ const Agenda = () => {
             )}
           </button>
         ))}
+
+        {waitlist.length > 0 && (
+          <button
+            className="agenda-simulate-btn animate-pulse"
+            onClick={simulateWaitlistPromotion}
+            title="Simulate a seat opening for your waitlisted session"
+          >
+            <Zap size={14} /> Simulate: Seat Opens
+          </button>
+        )}
       </div>
 
       {/* ── Timeline ── */}

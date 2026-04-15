@@ -58,6 +58,136 @@
   color: var(--accent-primary);
 }
 
+.view-mode-toggle {
+  display: flex;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  padding: 2px;
+}
+
+.view-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.view-btn:hover { color: var(--text-primary); }
+
+.view-btn.active {
+  background: var(--bg-secondary);
+  color: var(--accent-primary);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.mr-4 { margin-right: 1rem; }
+
+/* ── Network Graph ── */
+.network-graph-view {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  min-height: 540px;
+}
+
+.graph-svg {
+  filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.1));
+}
+
+.scanning-line {
+  stroke-dasharray: 100;
+  animation: scan 3s linear infinite;
+}
+
+@keyframes scan {
+  from { stroke-dashoffset: 200; }
+  to { stroke-dashoffset: 0; }
+}
+
+.center-pulse {
+  animation: centerPulse 4s infinite ease-in-out;
+}
+
+@keyframes centerPulse {
+  0%, 100% { transform: scale(1); opacity: 0.3; }
+  50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+.graph-node circle {
+  transition: all 0.3s;
+}
+
+.graph-node:hover .node-circle {
+  transform: scale(1.1);
+  stroke-width: 3;
+  filter: drop-shadow(0 0 10px var(--accent-primary));
+}
+
+.graph-node.is-connected .node-circle {
+  fill: rgba(16, 185, 129, 0.1);
+  stroke: var(--success);
+}
+
+.graph-sidebar {
+  width: 280px;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  align-self: flex-start;
+  margin-top: 2rem;
+}
+
+.graph-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--glass-border);
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot-primary { background: var(--accent-primary); }
+.dot-glow {
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.5); opacity: 0.5; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@media (max-width: 1000px) {
+  .network-graph-view { flex-direction: column; }
+  .graph-sidebar { width: 100%; margin-top: 0; }
+}
+
 /* ── Search & Filter bar ── */
 .explore-controls {
   display: flex;

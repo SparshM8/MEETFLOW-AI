@@ -176,6 +176,15 @@ export const AppProvider = ({ children }) => {
     showToast('Removed from agenda', 'info');
   };
 
+  const simulateWaitlistPromotion = () => {
+    if (waitlist.length > 0) {
+      const promotedSession = waitlist[0];
+      setWaitlist(prev => prev.slice(1));
+      setUserAgenda(prev => [...prev, promotedSession]);
+      showToast(`🚨 Waitlist Alert: A seat opened up for ${promotedSession.title} and you've been auto-promoted!`, 'success');
+    }
+  };
+
   const handleNetworkingState = (matchId, status) => {
     const existing = networkRoster.find(n => n.matchId === matchId);
     if (existing) {
@@ -206,7 +215,7 @@ export const AppProvider = ({ children }) => {
       activeConnectionMatch, setActiveConnectionMatch,
       isSidebarOpen, setIsSidebarOpen,
       completeOnboarding, updateUser, acceptReroute, dismissReroute,
-      rsvpToSession, removeFromAgenda, handleNetworkingState, resetApp,
+      rsvpToSession, removeFromAgenda, simulateWaitlistPromotion, handleNetworkingState, resetApp,
     }}>
       {children}
       <Toast toasts={toasts} removeToast={removeToast} />

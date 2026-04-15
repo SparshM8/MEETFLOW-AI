@@ -2,11 +2,108 @@ import React, { useState, useContext, useMemo } from 'react';
 import {
   Search, Users, Filter, X, Sparkles, Building2,
   Briefcase, Target, Zap, SlidersHorizontal, UserPlus,
-  Check, Send, Handshake, BookOpen
+  Check, Send, Handshake, BookOpen, LayoutGrid, Share2
 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getMatchScore } from '../utils/matchmaking';
 import './Explore.css';
+
+const NetworkGraph = ({ people, currentUser, onConnect, networkRoster }) => {
+  const centerNode = { name: currentUser.name, initial: currentUser.name.charAt(0) };
+  
+  // Plot top candidates in a circular orbit
+  const radius = 160;
+  const centerX = 250;
+  const centerY = 250;
+
+  return (
+    <div className="network-graph-view animate-fade-in">
+      <svg width="500" height="500" viewBox="0 0 500 500" className="graph-svg">
+        <defs>
+          <radialGradient id="centerGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="var(--accent-primary)" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        {/* Connection Lines */}
+        {people.map((p, i) => {
+          const angle = (i * (360 / people.length)) * (Math.PI / 180);
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          const opacity = Math.max(0.1, p.score / 100);
+          
+          return (
+            <g key={`line-${p.id}`} className="graph-connection">
+              <line 
+                x1={centerX} y1={centerY} x2={x} y2={y} 
+                stroke="var(--accent-primary)" 
+                strokeWidth={2}
+                strokeOpacity={opacity}
+                className="scanning-line"
+              />
+              <circle cx={x} cy={y} r={4} fill="var(--accent-primary)" opacity={opacity} />
+            </g>
+          );
+        })}
+
+        {/* Center Node (User) */}
+        <circle cx={centerX} cy={centerY} r={50} fill="url(#centerGlow)" className="center-pulse" />
+        <g className="node-center">
+           <circle cx={centerX} cy={centerY} r={32} fill="var(--bg-secondary)" stroke="var(--accent-primary)" strokeWidth={2} />
+           <text x={centerX} y={centerY} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="18" fontWeight="bold">
+             {centerNode.initial}
+           </text>
+           <text x={centerX} y={centerY + 45} textAnchor="middle" fill="var(--text-secondary)" fontSize="10" fontWeight="600">YOU</text>
+        </g>
+
+        {/* Outer Nodes */}
+        {people.map((p, i) => {
+          const angle = (i * (360 / people.length)) * (Math.PI / 180);
+          const x = centerX + radius * Math.cos(angle);
+          const y = centerY + radius * Math.sin(angle);
+          const hue = (p.name.charCodeAt(0) * 7) % 360;
+          const initial = p.name.charAt(0);
+          const rosterStatus = networkRoster.find(n => n.matchId === p.id)?.status;
+
+          return (
+            <g 
+              key={`node-${p.id}`} 
+              className={`graph-node ${rosterStatus ? 'is-connected' : ''}`}
+              onClick={() => onConnect(p)}
+              style={{ cursor: 'pointer' }}
+            >
+              <circle cx={x} cy={y} r={24} fill="var(--bg-secondary)" stroke={`hsl(${hue},60%,50%)`} strokeWidth={2} className="node-circle" />
+              <text x={x} y={y} textAnchor="middle" dominantBaseline="middle" fill="white" fontSize="12" fontWeight="bold">
+                {initial}
+              </text>
+              <text x={x} y={y + 35} textAnchor="middle" fill="var(--text-primary)" fontSize="9" fontWeight="600" className="node-label">
+                {p.name.split(' ')[0]}
+              </text>
+              <text x={x} y={y + 45} textAnchor="middle" fill="var(--accent-primary)" fontSize="8" fontWeight="bold">
+                {p.score}%
+              </text>
+            </g>
+          );
+        })}
+      </svg>
+      
+      <div className="graph-sidebar card">
+        <div className="flex items-center gap-2 mb-4">
+          <Sparkles size={16} className="text-accent-primary" />
+          <h3 className="text-sm font-bold">Neural Networking Map</h3>
+        </div>
+        <p className="text-xs text-secondary leading-relaxed mb-4">
+          Your AI concierge has mapped the event's high-value nodes relative to your profile. Click a node to start an intro.
+        </p>
+        <div className="graph-legend">
+          <div className="legend-item"><span className="dot dot-primary"></span> High Compatibility</div>
+          <div className="legend-item"><span className="dot dot-glow"></span> Signal Active</div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const FILTER_SKILLS = ['Python', 'React', 'TensorFlow', 'Product Strategy', 'Figma', 'System Architecture', 'Node.js', 'AWS'];
 const FILTER_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 'UX for AI', 'Web3', 'SaaS', 'Data'];
@@ -112,6 +209,7 @@ const Explore = () => {
   const [activeExp, setActiveExp] = useState(null);
   const [activeAvail, setActiveAvail] = useState(null);
   const [sortBy, setSortBy] = useState('match'); // 'match' | 'name' | 'exp'
+  const [viewMode, setViewMode] = useState('grid'); // 'grid' | 'graph'
 
   const hasFilters = activeSkill || activeInterest || activeExp || activeAvail;
 
@@ -168,6 +266,14 @@ const Explore = () => {
           </p>
         </div>
         <div className="explore-sort-row">
+          <div className="view-mode-toggle mr-4">
+            <button className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`} onClick={() => setViewMode('grid')}>
+              <LayoutGrid size={15} />
+            </button>
+            <button className={`view-btn ${viewMode === 'graph' ? 'active' : ''}`} onClick={() => setViewMode('graph')}>
+              <Share2 size={15} />
+            </button>
+          </div>
           <span className="text-xs text-tertiary">Sort by:</span>
           {[['match', 'Best Match'], ['name', 'Name'], ['exp', 'Seniority']].map(([val, label]) => (
             <button
@@ -274,33 +380,45 @@ const Explore = () => {
         </span>
       </div>
 
-      {/* ── Grid ── */}
-      {filtered.length > 0 ? (
-        <div className="explore-grid">
-          {filtered.map((attendee, i) => {
-            const rosterEntry = networkRoster.find(n => n.matchId === attendee.id);
-            return (
-              <div key={attendee.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i * 40, 300)}ms` }}>
-                <AttendeeBigCard
-                  attendee={attendee}
-                  score={attendee.score}
-                  signals={attendee.signals}
-                  status={rosterEntry?.status}
-                  onConnect={match => setActiveConnectionMatch({ ...match, matchDetails: { score: match.score, sharedInterests: match.signals.find(s => s.label === 'Shared')?.value?.split(', ') || [], sharedSkills: match.signals.find(s => s.label === 'Skills')?.value?.split(', ') || [], matchingGoals: [] } })}
-                />
-              </div>
-            );
-          })}
-        </div>
+      {/* ── Content ── */}
+      {viewMode === 'graph' ? (
+        <NetworkGraph 
+          people={filtered.slice(0, 12)} 
+          currentUser={currentUser} 
+          networkRoster={networkRoster}
+          onConnect={match => setActiveConnectionMatch({ ...match, matchDetails: { score: match.score, sharedInterests: match.signals.find(s => s.label === 'Shared')?.value?.split(', ') || [], sharedSkills: match.signals.find(s => s.label === 'Skills')?.value?.split(', ') || [], matchingGoals: [] } })}
+        />
       ) : (
-        <div className="explore-empty card">
-          <Users size={40} className="text-tertiary" />
-          <h3 className="text-primary mt-4">No attendees found</h3>
-          <p className="text-secondary text-sm mt-2">Try adjusting your search or clearing filters.</p>
-          <button className="btn btn-outline mt-4" onClick={() => { setQuery(''); clearFilters(); }}>
-            Reset Search
-          </button>
-        </div>
+        <>
+          {/* ── Grid ── */}
+          {filtered.length > 0 ? (
+            <div className="explore-grid">
+              {filtered.map((attendee, i) => {
+                const rosterEntry = networkRoster.find(n => n.matchId === attendee.id);
+                return (
+                  <div key={attendee.id} className="animate-fade-in" style={{ animationDelay: `${Math.min(i * 40, 300)}ms` }}>
+                    <AttendeeBigCard
+                      attendee={attendee}
+                      score={attendee.score}
+                      signals={attendee.signals}
+                      status={rosterEntry?.status}
+                      onConnect={match => setActiveConnectionMatch({ ...match, matchDetails: { score: match.score, sharedInterests: match.signals.find(s => s.label === 'Shared')?.value?.split(', ') || [], sharedSkills: match.signals.find(s => s.label === 'Skills')?.value?.split(', ') || [], matchingGoals: [] } })}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="explore-empty card">
+              <Users size={40} className="text-tertiary" />
+              <h3 className="text-primary mt-4">No attendees found</h3>
+              <p className="text-secondary text-sm mt-2">Try adjusting your search or clearing filters.</p>
+              <button className="btn btn-outline mt-4" onClick={() => { setQuery(''); clearFilters(); }}>
+                Reset Search
+              </button>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
