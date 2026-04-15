@@ -31,25 +31,45 @@ Ranks other attendees by compatibility across goals, skills, and interests. Surf
 Generates context-aware, natural conversation starters for each match. Eliminates cold-start friction so the first message doesn't take 10 minutes to write.
 
 ### 📅 Smart Agenda Planning
-Recommends sessions aligned with the attendee's profile — not just what's popular. Builds a coherent, conflict-free schedule from event data.
+Recommends sessions aligned with the attendee's profile. Includes **Conflict Detection** to warn when overlapping sessions are saved and **Live Countdown Timers** for immediate context.
 
 ### 🔀 Context-Aware Rerouting
-When a session becomes full or unavailable, the system instantly surfaces a better alternative — keeping the attendee productive rather than stranded.
+When a session becomes full, the system instantly surfaces alternatives. Includes a built-in **Waitlist Promotion Simulator** to demonstrate real-time seat availability alerts.
 
-### 🪪 Rich Attendee Profile
-Verification state, skill signals, networking intent, and event availability — designed to simulate a real event-tech platform, not a static form.
+### 🕸️ Neural Networking Map
+A visual SVG graph that plots your position in the event's social graph. High-value matches orbit your profile, with connection lines weighted and animated by compatibility score.
+
+### 💬 Global AI Concierge Chat
+A floating AI assistant available on every page. Ask questions about the schedule, find co-founders, or get event-specific Fallback recommendations in real-time.
+
+### 📝 Session Notes & persistence
+Take quick notes on any session that persist across reloads. The entire app state (Agenda, Roster, Profile) is saved locally for a robust, offline-resilient demo.
+
+### 🗓️ Universal Calendar Sync
+Download `.ics` files for any session to sync your MeetFlow agenda with Google, Apple, or Outlook calendars instantly.
+
+---
+
+## Why it's Competition-Ready
+
+Most event apps are static directories. MeetFlow AI is a reactive agent.
+
+- **Deterministic AI Mock Layer**: The matchmaking and icebreaker logic uses structured heuristics that can be swapped for a live Gemini API key in seconds.
+- **Explainable Matching**: We don't just give a score; we show "Match Signals" (Shared Skills, Complementary Goals) so users trust the recommendations.
+- **High-Fidelity UI**: Dark-mode-first design with smooth SVG animations, glassmorphism, and standard React performance optimizations.
 
 ---
 
 ## Demo Flow
 
 ```
-1. Complete onboarding (name, role, skills, interests, goals, availability)
-2. Land on personalised dashboard — top matches + AI top pick session
-3. Open a Match card → view shared context → send AI-crafted intro request
-4. Review your optimised agenda → RSVP to sessions
-5. Watch a session fill up → accept the smart reroute recommendation
-6. Visit your Profile → track completion, network roster, and event activity
+1. Complete **Onboarding** (profile building & interest mapping)
+2. Explore the **Neural Networking Map** to visualize your top matches
+3. Open a **Match Details** view to see Explainable AI compatibility signals
+4. Build your **Agenda** and sync a session to your physical phone's calendar
+5. Trigger a **Waitlist Simulation** to see reactive auto-promotion in action
+6. Chat with the **AI Concierge FAB** for real-time schedule support
+7. **Reset App Data** in the Profile to fresh-start the demo for the next judge
 ```
 
 ---
