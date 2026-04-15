@@ -380,6 +380,21 @@ const Profile = () => {
         </div>
       )}
 
+      {/* ── UTILITIES ── */}
+      <div className="profile-utilities text-center mt-6 pt-4 border-t border-glass">
+        <button 
+          className="btn btn-outline text-danger" 
+          onClick={() => {
+            if (window.confirm("Are you sure you want to reset all data and sign out? This cannot be undone.")) {
+              resetApp();
+            }
+          }}
+          style={{ borderColor: 'transparent', fontSize: '0.8rem' }}
+        >
+          <RotateCcw size={14} /> Reset App Data
+        </button>
+      </div>
+
       {/* ── EDIT MODAL ────────────────────────── */}
       {isEditing && formData && (
         <div className="edit-overlay animate-fade-in" onClick={handleCancel}>
