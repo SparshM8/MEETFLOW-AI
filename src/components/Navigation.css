@@ -139,3 +139,17 @@
   }
   .mobile-close-btn { display: flex; align-items: center; }
 }
+
+/* Logout button specific */
+.nav-logout {
+  width: 100%;
+  margin-top: 0.5rem;
+  color: #ff8c42; /* Soft orange/red */
+}
+
+.nav-logout:hover {
+  background: rgba(255, 140, 66, 0.1);
+  color: #ff6b35;
+  border-color: rgba(255, 140, 66, 0.2);
+}
+

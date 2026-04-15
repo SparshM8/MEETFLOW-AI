@@ -204,6 +204,17 @@ export const AppProvider = ({ children }) => {
     showToast(msgMap[status] || 'Network updated', status === 'requested' ? 'success' : 'info');
   };
 
+  /* ── Auth Actions ── */
+  const logOut = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setCurrentUser(null);
+    setUserAgenda([]);
+    setWaitlist([]);
+    setNetworkRoster([]);
+    setSessionNotes({});
+    showToast('Signed out successfully', 'info');
+  };
+
   /* ── Reset (for testing) ── */
   const resetApp = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -219,7 +230,7 @@ export const AppProvider = ({ children }) => {
       activeConnectionMatch, setActiveConnectionMatch,
       isSidebarOpen, setIsSidebarOpen,
       completeOnboarding, updateUser, acceptReroute, dismissReroute,
-      rsvpToSession, removeFromAgenda, simulateWaitlistPromotion, handleNetworkingState, resetApp,
+      rsvpToSession, removeFromAgenda, simulateWaitlistPromotion, handleNetworkingState, logOut, resetApp,
     }}>
       {children}
       <Toast toasts={toasts} removeToast={removeToast} />

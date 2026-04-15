@@ -1,11 +1,11 @@
 import React, { useContext, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { Sparkles, LayoutDashboard, CalendarDays, UserRound, X, Compass } from 'lucide-react';
+import { Sparkles, LayoutDashboard, CalendarDays, UserRound, X, Compass, LogOut } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import './Navigation.css';
 
 const Navigation = () => {
-  const { currentUser, isSidebarOpen, setIsSidebarOpen } = useContext(AppContext);
+  const { currentUser, isSidebarOpen, setIsSidebarOpen, logOut } = useContext(AppContext);
 
   useEffect(() => {
     const handleResize = () => {
@@ -60,6 +60,11 @@ const Navigation = () => {
               <span className="nav-user-role text-xs text-tertiary">{currentUser?.role || 'View profile'}</span>
             </div>
           </NavLink>
+          
+          <button className="nav-item nav-logout mt-2" onClick={logOut}>
+            <LogOut size={19} />
+            <span>Logout</span>
+          </button>
         </div>
       </nav>
     </>

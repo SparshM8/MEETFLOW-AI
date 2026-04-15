@@ -6,16 +6,16 @@ import Navigation from './components/Navigation';
 import RerouteAlert from './components/RerouteAlert';
 import SessionDrawer from './components/SessionDrawer';
 import ConnectionModal from './components/ConnectionModal';
+import Onboarding from './pages/Onboarding';
+import Dashboard from './pages/Dashboard';
+import Agenda from './pages/Agenda';
+import MatchDetails from './pages/MatchDetails';
+import Profile from './pages/Profile';
+import Explore from './pages/Explore';
+import LandingPage from './pages/LandingPage';
 import AIChatFAB from './components/AIChatFAB';
 
 import './App.css';
-
-const Onboarding = lazy(() => import('./pages/Onboarding'));
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Agenda = lazy(() => import('./pages/Agenda'));
-const MatchDetails = lazy(() => import('./pages/MatchDetails'));
-const Profile = lazy(() => import('./pages/Profile'));
-const Explore = lazy(() => import('./pages/Explore'));
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -103,7 +103,8 @@ const App = () => {
           <MainLayout>
             <Suspense fallback={<RouteLoader />}>
               <Routes>
-                <Route path="/" element={<Onboarding />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/onboarding" element={<Onboarding />} />
                 <Route
                   path="/dashboard"
                   element={
