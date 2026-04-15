@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, CalendarDays, Zap, ArrowRight, Users, Brain, Target, Clock } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
@@ -81,12 +81,10 @@ const AIBriefing = ({ currentUser, topMatches, topRecommended, userAgenda, netwo
 const Dashboard = () => {
   const { currentUser, attendees, userAgenda, recommendedAgenda, networkRoster } = useContext(AppContext);
   const navigate = useNavigate();
-  const [topMatches, setTopMatches] = useState([]);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    setTopMatches(getTopMatches(currentUser, attendees, 4));
-  }, [currentUser, attendees]);
+  const topMatches = useMemo(
+    () => (currentUser ? getTopMatches(currentUser, attendees, 4) : []),
+    [currentUser, attendees]
+  );
 
   if (!currentUser) {
     return (

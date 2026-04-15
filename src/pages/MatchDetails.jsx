@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, MessageSquare, Briefcase, Zap, Loader2 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
@@ -11,34 +11,55 @@ const MatchDetails = () => {
   const navigate = useNavigate();
   const { currentUser, attendees } = useContext(AppContext);
   
-  const [match, setMatch] = useState(null);
   const [icebreaker, setIcebreaker] = useState('');
   const [reason, setReason] = useState('');
   const [loadingAI, setLoadingAI] = useState(true);
+  const [copyState, setCopyState] = useState('idle');
+
+  const match = useMemo(() => {
+    if (!currentUser || !attendees) return null;
+    const person = attendees.find(a => a.id === id);
+    if (!person) return null;
+    const details = getMatchScore(currentUser, person);
+    return { ...person, matchDetails: details, score: details.score };
+  }, [id, currentUser, attendees]);
 
   useEffect(() => {
-    if (!currentUser || !attendees) return;
-    
-    const person = attendees.find(a => a.id === id);
-    if (person) {
-      const details = getMatchScore(currentUser, person);
-      const matchData = { ...person, matchDetails: details, score: details.score };
-      setMatch(matchData);
-      
-      // trigger mock AI generation
-      const fetchAI = async () => {
-        setLoadingAI(true);
-        const [genReason, genIcebreaker] = await Promise.all([
-          generateReasonToConnect(currentUser, person, details),
-          generateIcebreaker(currentUser, person, details)
-        ]);
-        setReason(genReason);
-        setIcebreaker(genIcebreaker);
-        setLoadingAI(false);
-      };
-      fetchAI();
+    if (!match || !currentUser) return;
+    let cancelled = false;
+
+    // Trigger mock AI generation for the selected match.
+    const fetchAI = async () => {
+      setLoadingAI(true);
+      const [genReason, genIcebreaker] = await Promise.all([
+        generateReasonToConnect(currentUser, match, match.matchDetails),
+        generateIcebreaker(currentUser, match, match.matchDetails)
+      ]);
+
+      if (cancelled) return;
+      setReason(genReason);
+      setIcebreaker(genIcebreaker);
+      setLoadingAI(false);
+      setCopyState('idle');
+    };
+
+    fetchAI();
+    return () => {
+      cancelled = true;
+    };
+  }, [match, currentUser]);
+
+  const handleCopyIcebreaker = async () => {
+    if (!icebreaker || copyState === 'copied') return;
+    try {
+      await navigator.clipboard.writeText(icebreaker);
+      setCopyState('copied');
+      setTimeout(() => setCopyState('idle'), 1800);
+    } catch {
+      setCopyState('error');
+      setTimeout(() => setCopyState('idle'), 1800);
     }
-  }, [id, currentUser, attendees]);
+  };
 
   if (!match) return <div className="flex-center" style={{height:'100vh'}}><Loader2 className="animate-spin" /></div>;
 
@@ -82,7 +103,9 @@ const MatchDetails = () => {
           ) : (
             <div className="icebreaker-box">
               <p className="insight-text">"{icebreaker}"</p>
-              <button className="btn btn-primary btn-sm mt-3 w-full">Copy Message</button>
+              <button className="btn btn-primary btn-sm mt-3 w-full" onClick={handleCopyIcebreaker}>
+                {copyState === 'copied' ? 'Copied!' : copyState === 'error' ? 'Copy Failed' : 'Copy Message'}
+              </button>
             </div>
           )}
         </div>

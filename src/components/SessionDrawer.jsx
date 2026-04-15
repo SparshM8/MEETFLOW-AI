@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen, CalendarClock } from 'lucide-react';
 import { generateICS } from '../utils/calendar';
@@ -6,17 +6,13 @@ import './SessionDrawer.css';
 
 const SessionDrawer = ({ sessionId, onClose }) => {
   const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser, getSessionNote, saveSessionNote } = useContext(AppContext);
-  const [session, setSession] = useState(null);
   const [showWhyPanel, setShowWhyPanel] = useState(false);
-  const [noteText, setNoteText] = useState('');
+  const [noteDrafts, setNoteDrafts] = useState({});
 
-  useEffect(() => {
-    if (sessionId) {
-      const s = sessions.find(s => s.id === sessionId);
-      setSession(s);
-      if (s) setNoteText(getSessionNote(s.id));
-    }
-  }, [sessionId, sessions]);
+  const session = useMemo(
+    () => (sessionId ? sessions.find(s => s.id === sessionId) || null : null),
+    [sessionId, sessions]
+  );
 
   // Handle escape key to close
   useEffect(() => {
@@ -28,6 +24,8 @@ const SessionDrawer = ({ sessionId, onClose }) => {
   }, [onClose]);
 
   if (!session) return null;
+
+  const noteText = noteDrafts[session.id] ?? getSessionNote(session.id);
 
   const isRSVPd = userAgenda.some(s => s.id === session.id);
   const isWaitlisted = waitlist.some(s => s.id === session.id);
@@ -126,13 +124,20 @@ const SessionDrawer = ({ sessionId, onClose }) => {
               className="notes-textarea"
               placeholder="Jot down anything about this session — questions to ask, key takeaways, action items…"
               value={noteText}
-              onChange={e => setNoteText(e.target.value)}
+              onChange={e => setNoteDrafts(prev => ({ ...prev, [session.id]: e.target.value }))}
               rows={3}
             />
             <button
               className="btn btn-secondary btn-sm mt-2"
               style={{ fontSize: '0.75rem' }}
-              onClick={() => saveSessionNote(session.id, noteText)}
+              onClick={() => {
+                saveSessionNote(session.id, noteText);
+                setNoteDrafts(prev => {
+                  const next = { ...prev };
+                  delete next[session.id];
+                  return next;
+                });
+              }}
             >
               Save Note
             </button>

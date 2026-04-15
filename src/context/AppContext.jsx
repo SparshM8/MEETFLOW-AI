@@ -1,8 +1,9 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useEffect, useMemo, useRef, useState } from 'react';
 import { sessions as initialSessions, attendees } from '../data/mockData';
 import { getRecommendedAgenda, getAlternativeSession } from '../utils/agenda';
 import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
 
 /* ── localStorage helpers ───────────────── */
@@ -56,7 +57,7 @@ export const AppProvider = ({ children }) => {
 
   const [currentUser, setCurrentUser] = useState(saved.currentUser || null);
   const [sessions, setSessions] = useState(initialSessions);
-  const [recommendedAgenda, setRecommendedAgenda] = useState([]);
+  const [rerouteOverrides, setRerouteOverrides] = useState({});
   const [userAgenda, setUserAgenda] = useState(saved.userAgenda || []);
   const [waitlist, setWaitlist] = useState(saved.waitlist || []);
   const [rerouteAlert, setRerouteAlert] = useState(null);
@@ -71,6 +72,16 @@ export const AppProvider = ({ children }) => {
   const [toasts, setToasts] = useState([]);
   // Legacy single toast (so components using toastMessage still work)
   const [toastMessage, setToastMessage] = useState('');
+  const toastIdRef = useRef(1);
+  const recommendedAgenda = useMemo(() => {
+    if (!currentUser?.name) return [];
+    const baseRecommendations = getRecommendedAgenda(currentUser, sessions);
+    return baseRecommendations.map(session =>
+      rerouteOverrides[session.id]
+        ? { ...rerouteOverrides[session.id], isAlternate: true }
+        : session
+    );
+  }, [currentUser, sessions, rerouteOverrides]);
 
   /* ── Persistence: save on every relevant state change ── */
   useEffect(() => {
@@ -79,7 +90,7 @@ export const AppProvider = ({ children }) => {
 
   /* ── Toast helpers ── */
   const showToast = (message, type = 'success') => {
-    const id = Date.now();
+    const id = toastIdRef.current++;
     setToasts(prev => [...prev.slice(-3), { id, message, type }]); // max 4 toasts
     setTimeout(() => removeToast(id), 3500);
     // Also set legacy for any component still reading toastMessage
@@ -97,13 +108,6 @@ export const AppProvider = ({ children }) => {
 
   const getSessionNote = (sessionId) => sessionNotes[sessionId] || '';
 
-  /* ── Recommended Agenda ── */
-  useEffect(() => {
-    if (currentUser?.name) {
-      setRecommendedAgenda(getRecommendedAgenda(currentUser, sessions));
-    }
-  }, [currentUser]);
-
   /* ── Smart Rerouting ── */
   useEffect(() => {
     if (currentUser && recommendedAgenda.length > 0 && !rerouteAlert) {
@@ -120,17 +124,15 @@ export const AppProvider = ({ children }) => {
       }, 15000);
       return () => clearTimeout(timer);
     }
-  }, [currentUser, recommendedAgenda]);
+  }, [currentUser, recommendedAgenda, rerouteAlert, sessions]);
 
   /* ── Actions ── */
   const acceptReroute = () => {
     if (rerouteAlert) {
-      const newRec = recommendedAgenda.map(s =>
-        s.id === rerouteAlert.originalSession.id
-          ? { ...rerouteAlert.newSession, isAlternate: true }
-          : s
-      );
-      setRecommendedAgenda(newRec);
+      setRerouteOverrides(prev => ({
+        ...prev,
+        [rerouteAlert.originalSession.id]: rerouteAlert.newSession,
+      }));
       if (userAgenda.find(s => s.id === rerouteAlert.originalSession.id)) {
         setUserAgenda(prev => [
           ...prev.filter(s => s.id !== rerouteAlert.originalSession.id),
@@ -147,11 +149,13 @@ export const AppProvider = ({ children }) => {
   const dismissReroute = () => setRerouteAlert(null);
 
   const completeOnboarding = (userData) => {
+    setRerouteOverrides({});
     setCurrentUser(userData);
     showToast(`Welcome, ${userData.name.split(' ')[0]}! Your event plan is ready.`, 'success');
   };
 
   const updateUser = (newData) => {
+    setRerouteOverrides({});
     setCurrentUser(newData);
     showToast('Profile updated successfully!', 'success');
   };

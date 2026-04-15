@@ -11,8 +11,6 @@ const PRESET_SKILLS = ['Python', 'React', 'TensorFlow', 'Product Strategy', 'Fig
 const Onboarding = () => {
   const navigate = useNavigate();
   const { completeOnboarding } = useContext(AppContext);
-  const [currentStep, setCurrentStep] = useState(1);
-  const TOTAL_STEPS = 3;
   
   const [formData, setFormData] = useState({
     name: '',
