@@ -21,14 +21,14 @@ const Navigation = () => {
     <>
       <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={close}></div>
 
-      <nav className={`side-nav ${isSidebarOpen ? 'open' : ''}`}>
+      <nav className={`side-nav ${isSidebarOpen ? 'open' : ''}`} role="navigation" aria-label="Main navigation">
         {/* Brand */}
         <div className="nav-brand">
           <div className="flex items-center gap-3">
             <Sparkles className="brand-icon" size={24} />
             <span className="brand-text gradient-text-accent">MeetFlow AI</span>
           </div>
-          <button className="mobile-close-btn" onClick={close}>
+          <button className="mobile-close-btn" onClick={close} aria-label="Close menu">
             <X size={22} className="text-secondary" />
           </button>
         </div>
@@ -61,7 +61,7 @@ const Navigation = () => {
             </div>
           </NavLink>
           
-          <button className="nav-item nav-logout mt-2" onClick={logOut}>
+          <button className="nav-item nav-logout mt-2" onClick={logOut} aria-label="Logout">
             <LogOut size={19} />
             <span>Logout</span>
           </button>

@@ -19,6 +19,7 @@ export function parseSessionTime(timeStr) {
   };
 
   const start = toMinutes(parts[0]);
+  if (start === null) return null; // FIX: Ensure we return null if start time is invalid
   const end = parts[1] ? toMinutes(parts[1]) : start + 60;
   return { start, end };
 }

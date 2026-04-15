@@ -5,6 +5,7 @@ import { AppContext } from '../context/AppContext';
 import { getTopMatches } from '../utils/matchmaking';
 import MatchCard from '../components/MatchCard';
 import SessionCard from '../components/SessionCard';
+import EventFeed from '../components/EventFeed';
 import './Dashboard.css';
 
 /* ── AI Briefing Panel ─────────────────────────── */
@@ -218,6 +219,11 @@ const Dashboard = () => {
                 </div>
               )}
             </div>
+          </section>
+
+          {/* New Live Feed Section */}
+          <section className="mt-6">
+            <EventFeed />
           </section>
         </div>
       </div>

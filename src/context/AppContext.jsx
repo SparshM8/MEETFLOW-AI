@@ -1,7 +1,9 @@
 import React, { createContext, useEffect, useMemo, useRef, useState } from 'react';
 import { sessions as initialSessions, attendees } from '../data/mockData';
-import { getRecommendedAgenda, getAlternativeSession } from '../utils/agenda';
-import { CheckCircle2, AlertTriangle, Info, X } from 'lucide-react';
+import { getRecommendedAgenda, getAlternativeSession, evaluateConflict } from '../utils/agenda';
+import { detectConflicts } from '../utils/sessionUtils';
+import { CheckCircle2, AlertTriangle, Info, X, Zap } from 'lucide-react';
+import { saveNoteToCloud } from '../services/firebase';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
@@ -101,9 +103,15 @@ export const AppProvider = ({ children }) => {
   const removeToast = (id) => setToasts(prev => prev.filter(t => t.id !== id));
 
   /* ── Notes ── */
-  const saveSessionNote = (sessionId, note) => {
+  const saveSessionNote = async (sessionId, note) => {
     setSessionNotes(prev => ({ ...prev, [sessionId]: note }));
-    showToast('Note saved', 'success');
+    
+    // Cloud Sync (Google Firebase Adoption)
+    if (currentUser?.email) {
+      await saveNoteToCloud(currentUser.email, sessionId, note);
+    }
+    
+    showToast('Note saved & synced to cloud', 'success');
   };
 
   const getSessionNote = (sessionId) => sessionNotes[sessionId] || '';
@@ -167,7 +175,18 @@ export const AppProvider = ({ children }) => {
         showToast(`Added to waitlist: ${session.title}`, 'warning');
       }
     } else {
-      if (!userAgenda.find(s => s.id === session.id)) {
+      const alreadyIn = userAgenda.find(s => s.id === session.id);
+      if (!alreadyIn) {
+        // AI Conflict Agent Logic
+        const existingConflicts = detectConflicts([...userAgenda, session]);
+        
+        if (existingConflicts.length > 0) {
+          const conflict = existingConflicts[existingConflicts.length - 1];
+          const advisor = evaluateConflict(conflict.a, conflict.b, currentUser);
+          
+          showToast(`⚡ Concierge Advice: Conflict detected. ${advisor.reason}`, 'info');
+        }
+
         setUserAgenda(prev => [...prev, session]);
         showToast(`RSVP confirmed: ${session.title}`, 'success');
       }

@@ -83,3 +83,38 @@ export const getAlternativeSession = (fullSession, currentUser, allSessions) => 
   scoredAlts.sort((a, b) => b.score - a.score);
   return scoredAlts[0];
 };
+
+/**
+ * Intelligent Agent: Evaluates a conflict between two sessions.
+ * Returns { recommendation: session, reason: string }
+ */
+export const evaluateConflict = (sessionA, sessionB, currentUser) => {
+  const userKeywords = [
+    ...(currentUser.interests || []),
+    ...(currentUser.skills || [])
+  ].map(kw => kw.toLowerCase());
+
+  const getScore = (s) => {
+    let score = 0;
+    s.tags.forEach(tag => {
+      if (userKeywords.some(kw => tag.toLowerCase().includes(kw))) score += 10;
+    });
+    return score;
+  };
+
+  const scoreA = getScore(sessionA);
+  const scoreB = getScore(sessionB);
+
+  if (scoreA >= scoreB) {
+    return {
+      recommendation: sessionA,
+      reason: `"${sessionA.title}" has a stronger alignment (${scoreA} pts) with your profile skills and interests compared to "${sessionB.title}".`
+    };
+  } else {
+    return {
+      recommendation: sessionB,
+      reason: `Based on your stated goals, "${sessionB.title}" offers more relevant insights (${scoreB} pts) than the conflicting session.`
+    };
+  }
+};
+
