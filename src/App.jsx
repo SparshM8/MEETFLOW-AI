@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { Suspense, lazy, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Menu } from 'lucide-react';
 import { AppProvider, AppContext } from './context/AppContext';
@@ -6,15 +6,16 @@ import Navigation from './components/Navigation';
 import RerouteAlert from './components/RerouteAlert';
 import SessionDrawer from './components/SessionDrawer';
 import ConnectionModal from './components/ConnectionModal';
-import Onboarding from './pages/Onboarding';
-import Dashboard from './pages/Dashboard';
-import Agenda from './pages/Agenda';
-import MatchDetails from './pages/MatchDetails';
-import Profile from './pages/Profile';
-import Explore from './pages/Explore';
 import AIChatFAB from './components/AIChatFAB';
 
 import './App.css';
+
+const Onboarding = lazy(() => import('./pages/Onboarding'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Agenda = lazy(() => import('./pages/Agenda'));
+const MatchDetails = lazy(() => import('./pages/MatchDetails'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Explore = lazy(() => import('./pages/Explore'));
 
 class ErrorBoundary extends React.Component {
   constructor(props) {
@@ -87,57 +88,66 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+const RouteLoader = () => (
+  <div className="dashboard-gate" role="status" aria-live="polite">
+    <h2 className="text-primary">Loading your page...</h2>
+    <p className="text-secondary mt-2 text-sm">Preparing your concierge experience.</p>
+  </div>
+);
+
 const App = () => {
   return (
     <ErrorBoundary>
       <AppProvider>
         <Router>
           <MainLayout>
-            <Routes>
-              <Route path="/" element={<Onboarding />} />
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/agenda"
-                element={
-                  <ProtectedRoute>
-                    <Agenda />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/match/:id"
-                element={
-                  <ProtectedRoute>
-                    <MatchDetails />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/profile"
-                element={
-                  <ProtectedRoute>
-                    <Profile />
-                  </ProtectedRoute>
-                }
-              />
-              <Route
-                path="/explore"
-                element={
-                  <ProtectedRoute>
-                    <Explore />
-                  </ProtectedRoute>
-                }
-              />
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+            <Suspense fallback={<RouteLoader />}>
+              <Routes>
+                <Route path="/" element={<Onboarding />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <ProtectedRoute>
+                      <Dashboard />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/agenda"
+                  element={
+                    <ProtectedRoute>
+                      <Agenda />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/match/:id"
+                  element={
+                    <ProtectedRoute>
+                      <MatchDetails />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/explore"
+                  element={
+                    <ProtectedRoute>
+                      <Explore />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Fallback */}
+                <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </MainLayout>
         </Router>
       </AppProvider>
