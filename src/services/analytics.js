@@ -37,3 +37,8 @@ export const trackConnection = (matchId, type = 'sent') => {
 export const trackReroute = (fromSessionId, toSessionId) => {
   logEvent('ai_reroute_triggered', { from: fromSessionId, to: toSessionId });
 };
+
+export const trackAIFeedback = (matchId, type, component) => {
+  logEvent('ai_feedback_received', { match_id: matchId, type, component });
+};
+

@@ -37,7 +37,7 @@ const RerouteAlert = ({ alertData, onAccept, onDismiss }) => {
             <div className="recommendation-tag">Smart Reroute</div>
             <p className="recommendation-title">{alertData.newSession.title}</p>
             <p className="recommendation-time">{alertData.newSession.time} • {alertData.newSession.location}</p>
-            <p className="recommendation-reason">Recommended based on your AI interests.</p>
+            <p className="recommendation-reason">{alertData.newSession.reason || 'Recommended based on your AI profile.'}</p>
           </div>
         </div>
 

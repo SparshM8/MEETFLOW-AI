@@ -1,10 +1,11 @@
 import React, { useContext, useState } from 'react';
 import {
   UserPlus, Sparkles, Handshake, Check, Send, Building2,
-  ChevronDown, ChevronUp, Target, Zap, Clock, BookOpen
+  ChevronDown, ChevronUp, Target, Zap, Clock, BookOpen, ThumbsUp, ThumbsDown
 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { generateMatchExplanation } from '../utils/matchmaking';
+import MeetingPrep from './MeetingPrep';
 import './MatchCard.css';
 
 const SIGNAL_ICONS = {
@@ -22,8 +23,9 @@ const SIGNAL_COLORS = {
 };
 
 const MatchCard = ({ match }) => {
-  const { networkRoster, setActiveConnectionMatch, currentUser } = useContext(AppContext);
+  const { networkRoster, setActiveConnectionMatch, currentUser, matchFeedback, handleMatchFeedback } = useContext(AppContext);
   const [showWhy, setShowWhy] = useState(false);
+  const [showPrep, setShowPrep] = useState(false);
 
   const existingConnection = networkRoster.find(n => n.matchId === match.id);
   const status = existingConnection ? existingConnection.status : null;
@@ -129,6 +131,36 @@ const MatchCard = ({ match }) => {
                   </div>
                 </div>
               )}
+
+              <button 
+                className={`btn btn-sm w-full mt-4 ${showPrep ? 'btn-primary' : 'btn-outline'}`}
+                onClick={(e) => { e.stopPropagation(); setShowPrep(!showPrep); }}
+              >
+                {showPrep ? 'Hide Prep Brief' : '1-Minute Prep Brief'}
+              </button>
+
+              {showPrep && <MeetingPrep currentUser={currentUser} partner={match} />}
+
+              {/* ── Feedback Row ── */}
+              <div className="ai-feedback-row mt-4 pt-3 flex-between border-t" style={{ borderColor: 'var(--glass-border)' }}>
+                <span className="text-xxs text-tertiary">Was this AI match useful?</span>
+                <div className="flex gap-2">
+                  <button 
+                    className={`btn-icon btn-xs ${matchFeedback[match.id] === 'positive' ? 'text-accent-primary' : 'text-tertiary'}`}
+                    onClick={(e) => { e.stopPropagation(); handleMatchFeedback(match.id, 'positive'); }}
+                    title="Highly Relevant"
+                  >
+                    <ThumbsUp size={12} />
+                  </button>
+                  <button 
+                    className={`btn-icon btn-xs ${matchFeedback[match.id] === 'negative' ? 'text-accent-warning' : 'text-tertiary'}`}
+                    onClick={(e) => { e.stopPropagation(); handleMatchFeedback(match.id, 'negative'); }}
+                    title="Not Relevant"
+                  >
+                    <ThumbsDown size={12} />
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </div>

@@ -3,13 +3,21 @@ import { Bell, UserPlus, Coffee, Zap } from 'lucide-react';
 import './EventFeed.css';
 
 const FEED_TEMPLATES = [
-  { id: 1, type: 'join', icon: <UserPlus />, text: 'Just joined the networking graph!' },
-  { id: 2, type: 'amenity', icon: <Coffee />, text: 'New catering station opened in the Lounge.' },
-  { id: 3, type: 'session', icon: <Zap />, text: 'Session starting soon: "The Future of GenAI".' },
-  { id: 4, type: 'match', icon: <Bell />, text: 'A new high-value match just entered the lobby.' }
+  { id: 1, type: 'join', icon: <UserPlus />, text: 'just joined the networking pool' },
+  { id: 2, type: 'amenity', icon: <Coffee />, text: 'New healthy catering station opened at Level 2' },
+  { id: 3, type: 'session', icon: <Zap />, text: 'is trending: 85% of matches are attending' },
+  { id: 4, type: 'match', icon: <Bell />, text: 'A new high-value match just entered your radius' },
+  { id: 5, type: 'social', icon: <UserPlus />, text: 'shared a note on "Next-Gen Architectures"' }
 ];
 
-const NAMES = ['Alex', 'Sarah', 'Prateek', 'Elena', 'Jordan', 'Maya'];
+const NAMES = ['Alex Chen', 'Sarah J.', 'Prateek K.', 'Elena Rossi', 'Jordan Smith', 'Maya V.', 'Dr. Liam', 'Chloe'];
+
+const TRENDING_SESSIONS = [
+  'The Future of GenAI',
+  'Advanced Microservices',
+  'Sustainable Tech 2026',
+  'Quantum Computing Keynote'
+];
 
 const EventFeed = () => {
   const [items, setItems] = useState([]);
@@ -30,9 +38,15 @@ const EventFeed = () => {
   function createItem(id) {
     const template = FEED_TEMPLATES[Math.floor(Math.random() * FEED_TEMPLATES.length)];
     const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+    const sessionName = TRENDING_SESSIONS[Math.floor(Math.random() * TRENDING_SESSIONS.length)];
+    
+    let text = template.text;
+    if (template.type === 'session') text = `"${sessionName}" ${template.text}`;
+
     return {
       id,
       ...template,
+      text,
       timestamp: 'Just now',
       name: template.type === 'amenity' ? 'Event Staff' : name
     };

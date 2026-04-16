@@ -6,6 +6,7 @@ import { getTopMatches } from '../utils/matchmaking';
 import MatchCard from '../components/MatchCard';
 import SessionCard from '../components/SessionCard';
 import EventFeed from '../components/EventFeed';
+import AchievementSummary from '../components/AchievementSummary';
 import './Dashboard.css';
 
 /* ── AI Briefing Panel ─────────────────────────── */
@@ -80,7 +81,7 @@ const AIBriefing = ({ currentUser, topMatches, topRecommended, userAgenda, netwo
 
 /* ── Main Dashboard ────────────────────────────── */
 const Dashboard = () => {
-  const { currentUser, attendees, userAgenda, recommendedAgenda, networkRoster } = useContext(AppContext);
+  const { currentUser, attendees, userAgenda, recommendedAgenda, networkRoster, eventStats } = useContext(AppContext);
   const navigate = useNavigate();
   const topMatches = useMemo(
     () => (currentUser ? getTopMatches(currentUser, attendees, 4) : []),
@@ -146,6 +147,9 @@ const Dashboard = () => {
         userAgenda={userAgenda}
         networkRoster={networkRoster}
       />
+
+      {/* ── Event Achievement Recap ── */}
+      <AchievementSummary stats={eventStats} />
 
       {/* ── Content Grid ── */}
       <div className="dashboard-grid mt-6">

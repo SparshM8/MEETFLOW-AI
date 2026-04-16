@@ -81,7 +81,15 @@ export const getAlternativeSession = (fullSession, currentUser, allSessions) => 
   });
 
   scoredAlts.sort((a, b) => b.score - a.score);
-  return scoredAlts[0];
+  const selected = scoredAlts[0];
+  
+  // Basic heuristic reason
+  const topInterest = userKeywords.find(kw => selected.tags.some(tag => tag.toLowerCase().includes(kw)));
+  const reason = topInterest 
+    ? `Strong alignment with your interest in ${topInterest}.`
+    : `Offers the best thematic overlap with your profile at this time slot.`;
+
+  return { session: selected, reason };
 };
 
 /**

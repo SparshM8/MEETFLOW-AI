@@ -5,6 +5,7 @@ import { detectConflicts } from '../utils/sessionUtils';
 import { CheckCircle2, AlertTriangle, Info, X, Zap } from 'lucide-react';
 import { saveNoteToCloud } from '../services/firebase';
 import { trackRSVP, trackConnection, trackReroute } from '../services/analytics';
+import { generateRerouteReason } from '../services/aiService';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
@@ -66,6 +67,7 @@ export const AppProvider = ({ children }) => {
   const [rerouteAlert, setRerouteAlert] = useState(null);
   const [networkRoster, setNetworkRoster] = useState(saved.networkRoster || []);
   const [sessionNotes, setSessionNotes] = useState(saved.sessionNotes || {}); // { sessionId: "note text" }
+  const [matchFeedback, setMatchFeedback] = useState(saved.matchFeedback || {}); // { matchId: 'positive' | 'negative' }
 
   const [activeDrawerSession, setActiveDrawerSession] = useState(null);
   const [activeConnectionMatch, setActiveConnectionMatch] = useState(null);
@@ -86,10 +88,26 @@ export const AppProvider = ({ children }) => {
     );
   }, [currentUser, sessions, rerouteOverrides]);
 
+  const eventStats = useMemo(() => {
+    const connectedCount = networkRoster.filter(n => n.status === 'connected').length;
+    const pendingCount = networkRoster.filter(n => n.status === 'requested').length;
+    const sessionsDone = userAgenda.length; // Simplified for demo
+    const expertiseScore = sessionsDone * 10 + connectedCount * 25;
+    const topTopic = currentUser?.interests?.[0] || 'Networking';
+
+    return {
+      connectedCount,
+      pendingCount,
+      sessionsDone,
+      expertiseScore,
+      topTopic
+    };
+  }, [networkRoster, userAgenda, currentUser]);
+
   /* ── Persistence: save on every relevant state change ── */
   useEffect(() => {
-    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes });
-  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes]);
+    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback });
+  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback]);
 
   /* ── Toast helpers ── */
   const showToast = (message, type = 'success') => {
@@ -127,8 +145,20 @@ export const AppProvider = ({ children }) => {
             s.id === sessionToFill.id ? { ...s, status: 'Full' } : s
           );
           setSessions(updated);
-          const alt = getAlternativeSession(sessionToFill, currentUser, updated);
-          if (alt) setRerouteAlert({ originalSession: sessionToFill, newSession: alt });
+          const { session: alt, reason: baseReason } = getAlternativeSession(sessionToFill, currentUser, updated);
+          
+          if (alt) {
+            // Enhance reason with AI if possible
+            generateRerouteReason(sessionToFill, alt, currentUser).then(aiReason => {
+              setRerouteAlert({ 
+                originalSession: sessionToFill, 
+                newSession: { 
+                  ...alt, 
+                  reason: aiReason.replacementReason || baseReason 
+                } 
+              });
+            });
+          }
         }
       }, 15000);
       return () => clearTimeout(timer);
@@ -228,6 +258,12 @@ export const AppProvider = ({ children }) => {
     showToast(msgMap[status] || 'Network updated', status === 'requested' ? 'success' : 'info');
   };
 
+  const handleMatchFeedback = (matchId, type) => {
+    setMatchFeedback(prev => ({ ...prev, [matchId]: type }));
+    import('../services/analytics').then(m => m.trackAIFeedback(matchId, type, 'MatchCard'));
+    showToast(type === 'positive' ? 'Great! Gemini will prioritize similar matches.' : 'Noted. Refining your match signals...', 'info');
+  };
+
   /* ── Auth Actions ── */
   const logOut = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -253,6 +289,8 @@ export const AppProvider = ({ children }) => {
       activeDrawerSession, setActiveDrawerSession,
       activeConnectionMatch, setActiveConnectionMatch,
       isSidebarOpen, setIsSidebarOpen,
+      matchFeedback, handleMatchFeedback,
+      eventStats,
       completeOnboarding, updateUser, acceptReroute, dismissReroute,
       rsvpToSession, removeFromAgenda, simulateWaitlistPromotion, handleNetworkingState, logOut, resetApp,
     }}>
