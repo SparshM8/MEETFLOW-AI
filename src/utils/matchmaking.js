@@ -99,7 +99,11 @@ export const getTopMatches = (currentUser, attendeesList, limit = 5) => {
   if (!currentUser || !currentUser.name) return attendeesList.slice(0, limit);
 
   const scoredMatches = attendeesList
-    .filter(a => a.id !== currentUser.id) // Self-exclusion
+    // Self-exclusion: compare by id if available, otherwise fall back to name
+    .filter(a => {
+      if (currentUser.id && a.id) return a.id !== currentUser.id;
+      return a.name !== currentUser.name;
+    })
     .map(attendee => {
       const details = getMatchScore(currentUser, attendee);
       return {
