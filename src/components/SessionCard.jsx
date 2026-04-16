@@ -2,10 +2,30 @@ import React, { useContext } from 'react';
 import { Clock, MapPin, Tag, ArrowRight, CheckCircle2, User, Radio } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getSessionCountdown } from '../utils/sessionUtils';
+import Skeleton from './Skeleton';
 import './SessionCard.css';
 
 const SessionCard = ({ session, isAlternate }) => {
   const { userAgenda, rsvpToSession, setActiveDrawerSession } = useContext(AppContext);
+
+  if (!session) {
+    return (
+      <div className="session-card card loading">
+        <div className="session-header flex-between mb-2">
+          <Skeleton width="60%" height="20px" />
+          <Skeleton width="40px" height="20px" />
+        </div>
+        <div className="session-info mb-4">
+          <Skeleton width="80%" height="14px" className="mb-2" />
+          <Skeleton width="50%" height="14px" />
+        </div>
+        <div className="flex gap-4">
+          <Skeleton width="100%" height="36px" />
+          <Skeleton width="80px" height="36px" />
+        </div>
+      </div>
+    );
+  }
 
   const isSaved = userAgenda.some(s => s.id === session.id);
   const countdown = getSessionCountdown(session.time);

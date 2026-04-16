@@ -53,18 +53,32 @@ When you RSVP to overlapping sessions, the concierge evaluates both against your
 ### 📊 Explainable Match Signals (XAI)
 We provide a **Match Confidence Breakdown** (Interests vs. Skills vs. Goals) for every connection, so you know exactly why the AI recommended a specific person.
 
+### 📝 1-Minute Networking Prep Briefs
+Before you connect, the concierge generates a compact "Cheat Sheet" including shared commonalities and icebreaker questions, ensuring you never walk into a meeting unprepared.
+
+### 🛡️ Zod-Validated AI Reliability
+Every AI interaction passes through a **Zod-schema validation pipeline**. This ensures the UI remains stable even if LLM outputs are unpredictable, providing production-grade reliability.
+
+### 🔄 Human-in-the-Loop AI Feedback
+Users can rate AI recommendations (Thumbs Up/Down), providing real-time signal feedback to the concierge to refine future matchmaking.
+
+### 📅 Native Calendar Integration (.ics)
+Export your AI-optimized schedule directly to Google, Apple, or Outlook calendars with one click.
+
 ### 🌊 Live Event Pulse Feed
-Real-time engagement feed showing live event activity, new high-value match entries, and amenity updates, keeping you fully immersed in the event flow.
+Real-time engagement feed showing live event activity, high-value match entries, and "Trending" session alerts.
 
 ---
 
 ## 🛠️ Tech Stack & Services
 
 - **Google Services**: [Firebase](https://firebase.google.com/) Firestore (Cloud Persistence)
-- **Testing**: [Vitest](https://vitest.dev/) (Logic Validation)
+- **AI Core**: [Google Gemini SDK](https://aistudio.google.com/) (1.5 Flash)
+- **Validation**: [Zod](https://zod.dev/) (Type-safe AI responses)
+- **Testing**: [Vitest](https://vitest.dev/) (Logic & Schema Validation)
 - **Framework**: [React 19](https://react.dev/) + [Vite](https://vitejs.dev/)
 - **Icons**: [Lucide React](https://lucide.dev/)
-- **AI Layer**: Gemini-Ready reasoning engine (`aiService.js`)
+- **Utility**: `ics` formatting for calendar parity.
 
 ---
 

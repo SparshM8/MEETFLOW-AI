@@ -13,6 +13,8 @@ import MatchDetails from './pages/MatchDetails';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import LandingPage from './pages/LandingPage';
+import NetworkGraph from './components/NetworkGraph';
+import ConciergeBot from './components/ConciergeBot';
 import TermsPrivacy from './pages/TermsPrivacy';
 import AIChatFAB from './components/AIChatFAB';
 import { GAPageView } from './services/analytics';
@@ -106,6 +108,7 @@ const App = () => {
           <MainLayout>
             <Suspense fallback={<RouteLoader />}>
               <Routes>
+                {/* ... routes ... */}
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/onboarding" element={<Onboarding />} />
                 <Route
@@ -154,6 +157,7 @@ const App = () => {
               </Routes>
             </Suspense>
           </MainLayout>
+          <ConciergeBot />
         </Router>
       </AppProvider>
     </ErrorBoundary>

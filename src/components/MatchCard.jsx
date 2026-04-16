@@ -6,6 +6,7 @@ import {
 import { AppContext } from '../context/AppContext';
 import { generateMatchExplanation } from '../utils/matchmaking';
 import MeetingPrep from './MeetingPrep';
+import Skeleton from './Skeleton';
 import './MatchCard.css';
 
 const SIGNAL_ICONS = {
@@ -24,6 +25,26 @@ const SIGNAL_COLORS = {
 
 const MatchCard = ({ match }) => {
   const { networkRoster, setActiveConnectionMatch, currentUser, matchFeedback, handleMatchFeedback } = useContext(AppContext);
+
+  if (!match) {
+    return (
+      <div className="match-card card loading">
+        <div className="match-card-top mb-4">
+          <Skeleton circle width="44px" height="44px" />
+          <div className="flex-1 ml-4">
+            <Skeleton width="60%" height="18px" className="mb-2" />
+            <Skeleton width="40%" height="14px" />
+          </div>
+        </div>
+        <div className="match-tags-row mb-4">
+          <Skeleton width="60px" height="22px" className="mr-2" />
+          <Skeleton width="80px" height="22px" />
+        </div>
+        <Skeleton width="100%" height="36px" />
+      </div>
+    );
+  }
+
   const [showWhy, setShowWhy] = useState(false);
   const [showPrep, setShowPrep] = useState(false);
 

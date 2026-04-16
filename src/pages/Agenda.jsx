@@ -4,6 +4,8 @@ import { AppContext } from '../context/AppContext';
 import SessionCard from '../components/SessionCard';
 import VenueMap from '../components/VenueMap';
 import { detectConflicts } from '../utils/sessionUtils';
+import { generateICS, downloadICS } from '../utils/calendar';
+import { Share, Download, ClipboardCheck } from 'lucide-react';
 import './Agenda.css';
 
 const ConflictBanner = ({ conflicts }) => {
@@ -61,6 +63,20 @@ const Agenda = () => {
   const displayedSessions = getFilteredSessions();
   const conflictIds = new Set(conflicts.flatMap(c => [c.a.id, c.b.id]));
 
+  const handleExport = () => {
+    const icsContent = generateICS(userAgenda, currentUser?.interests);
+    downloadICS(icsContent);
+  };
+
+  const handleCopySummary = () => {
+    const summary = userAgenda.map(s => `• ${s.time.split(' - ')[0]}: ${s.title} (${s.location})`).join('\n');
+    const header = `📅 My MeetFlow AI Agenda for ${new Date().toLocaleDateString()}\n\n`;
+    navigator.clipboard.writeText(header + summary);
+    // showToast is in context, but we can't call it here easily without moving it. 
+    // For now, simple alert or handled via browser clipboard events.
+    alert('Agenda summary copied to clipboard!');
+  };
+
   return (
     <div className="agenda-page animate-fade-in">
       {/* ── Header ── */}
@@ -74,6 +90,19 @@ const Agenda = () => {
           <p className="text-secondary text-sm mt-1">
             {userAgenda.length} confirmed · {waitlist.length} waitlisted · AI-ranked recommendations
           </p>
+        </div>
+
+        <div className="agenda-actions-group">
+          {userAgenda.length > 0 && (
+            <>
+              <button className="btn btn-outline btn-sm" onClick={handleCopySummary} title="Copy text summary">
+                <Share size={15} /> Share
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={handleExport} title="Download .ics file">
+                <Download size={15} /> Export to Calendar
+              </button>
+            </>
+          )}
         </div>
 
         {/* Stats strip */}
