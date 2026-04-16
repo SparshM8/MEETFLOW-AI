@@ -1,6 +1,4 @@
-import React, { useState, useEffect } from 'react';
-import { Target, MessageSquare, Info, Loader2 } from 'lucide-react';
-import { generateMeetingPrep } from '../services/aiService';
+import SafeContent from './SafeContent';
 import './MeetingPrep.css';
 
 const MeetingPrep = ({ currentUser, partner }) => {
@@ -38,9 +36,11 @@ const MeetingPrep = ({ currentUser, partner }) => {
       </div>
 
       <div className="prep-section">
-        <p className="prep-summary text-sm italic text-secondary">
-          "{prep.prepSummary}"
-        </p>
+        <SafeContent 
+          content={prep.prepSummary} 
+          tag="p" 
+          className="prep-summary text-sm italic text-secondary" 
+        />
       </div>
 
       <div className="prep-grid">
@@ -51,7 +51,9 @@ const MeetingPrep = ({ currentUser, partner }) => {
           </div>
           <ul className="prep-list">
             {prep.commonalities.map((item, i) => (
-              <li key={i} className="text-xs text-secondary">{item}</li>
+              <li key={i} className="text-xs text-secondary">
+                <SafeContent content={item} tag="span" />
+              </li>
             ))}
           </ul>
         </div>
@@ -63,7 +65,9 @@ const MeetingPrep = ({ currentUser, partner }) => {
           </div>
           <ul className="prep-list">
             {prep.discussionStarters.map((item, i) => (
-              <li key={i} className="text-xs text-secondary">{item}</li>
+              <li key={i} className="text-xs text-secondary">
+                <SafeContent content={item} tag="span" />
+              </li>
             ))}
           </ul>
         </div>

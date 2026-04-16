@@ -16,7 +16,7 @@ const FILTER_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 
 const FILTER_EXP = ['Junior', 'Mid-Level', 'Senior', 'Executive'];
 const FILTER_AVAIL = ['Highly Available', 'Mostly Available', 'Available for Coffee'];
 
-const AttendeeBigCard = ({ attendee, score, signals, onConnect, status }) => {
+const AttendeeBigCard = React.memo(({ attendee, score, signals, onConnect, status }) => {
   const initial = attendee.name?.charAt(0).toUpperCase();
   const hue = (attendee.name.charCodeAt(0) * 7) % 360;
 
@@ -104,7 +104,7 @@ const AttendeeBigCard = ({ attendee, score, signals, onConnect, status }) => {
       </div>
     </div>
   );
-};
+});
 
 const Explore = () => {
   const { attendees, currentUser, networkRoster, setActiveConnectionMatch } = useContext(AppContext);

@@ -1,7 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import { X, Sparkles, Send, BookmarkPlus, Loader2, UserPlus, RefreshCcw } from 'lucide-react';
-import { AppContext } from '../context/AppContext';
-import { generateIcebreaker, generateReasonToConnect } from '../services/aiService';
+import SafeContent from './SafeContent';
 import './ConnectionModal.css';
 
 const ConnectionModal = ({ match, onClose }) => {
@@ -98,7 +95,11 @@ const ConnectionModal = ({ match, onClose }) => {
         <div className="modal-body flex-col gap-6 overflow-y-auto pr-2">
           <div className="match-rationale">
              <h4 className="flex items-center gap-2 text-primary mb-2"><Sparkles size={16} className="text-accent-secondary"/> AI Synergy Assessment</h4>
-             {loading ? <div className="text-secondary flex items-center gap-2"><Loader2 size={16} className="animate-spin"/> Analyzing...</div> : <p className="text-sm leading-relaxed">{reason}</p>}
+             {loading ? (
+               <div className="text-secondary flex items-center gap-2"><Loader2 size={16} className="animate-spin"/> Analyzing...</div>
+             ) : (
+               <SafeContent content={reason} tag="p" className="text-sm leading-relaxed" />
+             )}
           </div>
 
           <div className="match-attributes grid-cols-2">

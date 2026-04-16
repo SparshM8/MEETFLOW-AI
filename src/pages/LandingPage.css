@@ -146,8 +146,25 @@
   margin: 0 auto 3rem;
 }
 
+.hero-cta-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 2rem;
+  width: 100%;
+}
+
+@media (min-width: 640px) {
+  .hero-cta-group {
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+  }
+}
+
 .hero-cta-btn {
-  padding: 1.1rem 2.5rem;
+  padding: 1rem 2.5rem;
   font-size: 1.1rem;
   font-weight: 600;
   border-radius: var(--radius-full);

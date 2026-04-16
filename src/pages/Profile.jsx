@@ -4,8 +4,9 @@ import {
   Edit3, Check, X, ShieldCheck, Link2, Mail, Building2,
   BookOpen, Clock, Users, CalendarDays, BarChart2, Sparkles,
   Globe, Briefcase, Target, Zap, RotateCcw, QrCode,
-  Eye, EyeOff, Shield, Trash2, Sliders
+  Eye, EyeOff, Shield, Trash2, Sliders, TrendingUp
 } from 'lucide-react';
+import AchievementSummary from '../components/AchievementSummary';
 import './Profile.css';
 
 const PRESET_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 'UX for AI', 'Predictive Modeling', 'Web3', 'SaaS', 'Data'];
@@ -82,6 +83,11 @@ const Profile = () => {
   const [formData, setFormData] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
 
+  // Elite simulated AI ROI Metrics
+  const networkDiversity = Math.min(100, (networkRoster.length * 25));
+  const topIndustry = "Generative AI & SaaS";
+  const skillExposure = ["Zod", "Gemini API", "React 19", "System Design"];
+
   if (!currentUser) {
     return (
       <div className="profile-empty-state">
@@ -113,7 +119,7 @@ const Profile = () => {
   // Mock skill levels based on order
   const skillLevels = [92, 78, 85];
 
-  const TABS = ['overview', 'network', 'activity', 'privacy'];
+  const TABS = ['overview', 'insights', 'network', 'activity', 'privacy'];
 
   return (
     <div className="profile-page animate-fade-in">
@@ -179,6 +185,7 @@ const Profile = () => {
               className={`profile-tab ${activeTab === t ? 'active' : ''}`}
               onClick={() => setActiveTab(t)}
             >
+              {t === 'insights' && <Sparkles size={11} className="mr-1 inline text-accent-secondary" />}
               {t.charAt(0).toUpperCase() + t.slice(1)}
             </button>
           ))}
@@ -188,7 +195,6 @@ const Profile = () => {
       {/* ── BODY ──────────────────────────────── */}
       {activeTab === 'overview' && (
         <div className="profile-body-grid animate-fade-in">
-
           {/* Left column */}
           <div className="profile-col-left">
 
@@ -313,6 +319,64 @@ const Profile = () => {
                   ))
                   : <span className="text-tertiary text-sm">No goals selected.</span>}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'insights' && (
+        <div className="profile-tab-panel animate-fade-in p-6">
+          <div className="card glass-panel p-6 border-glass">
+            <div className="flex-between mb-6">
+              <div className="flex items-center gap-2">
+                <TrendingUp className="text-secondary" size={20} />
+                <h3 className="section-title">Networking ROI Analysis</h3>
+              </div>
+              <div className="badge badge-ai">Analyzed by Gemini</div>
+            </div>
+
+            <div className="roi-grid grid gap-4 grid-cols-1 sm:grid-cols-3 mb-8">
+              <div className="roi-stat-card p-4 rounded-xl bg-glass-surface">
+                <p className="text-xs text-tertiary uppercase tracking-widest font-bold">Network Reach</p>
+                <div className="flex items-end gap-2 mt-2">
+                  <span className="text-3xl font-bold text-primary">{networkRoster.length}</span>
+                </div>
+              </div>
+              <div className="roi-stat-card p-4 rounded-xl bg-glass-surface">
+                <p className="text-xs text-tertiary uppercase tracking-widest font-bold">Diversity Score</p>
+                <div className="flex items-end gap-2 mt-2">
+                  <span className="text-3xl font-bold text-primary">{networkDiversity}%</span>
+                </div>
+              </div>
+              <div className="roi-stat-card p-4 rounded-xl bg-glass-surface">
+                <p className="text-xs text-tertiary uppercase tracking-widest font-bold">Top Cluster</p>
+                <div className="flex items-center gap-2 mt-2">
+                   <span className="text-sm font-medium text-primary">{topIndustry}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8">
+              <h4 className="text-sm font-bold text-secondary flex items-center gap-2 mb-4">
+                <Award size={16} className="text-accent-primary" />
+                Knowledge & Skill Exposure
+              </h4>
+              <div className="flex flex-wrap gap-2">
+                {skillExposure.map(skill => (
+                  <div key={skill} className="badge badge-outline bg-glass-surface">
+                    <Sparkles size={10} className="mr-2 text-accent-secondary" />
+                    {skill}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-glass">
+              <p className="text-xs text-tertiary italic">
+                "Based on your <b>{networkRoster.length} matches</b>, you've focused heavily on the intersection of AI safety and SaaS architecture. 
+                Meeting with 3 more Lead Engineers would broaden your networking target." 
+                — MeetFlow Insights
+              </p>
             </div>
           </div>
         </div>

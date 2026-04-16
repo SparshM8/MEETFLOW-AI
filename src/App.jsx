@@ -72,8 +72,27 @@ class ErrorBoundary extends React.Component {
   }
 }
 
+import CommandPalette from './components/CommandPalette';
+
 const MainLayout = ({ children }) => {
-  const { currentUser, activeDrawerSession, setActiveDrawerSession, activeConnectionMatch, setActiveConnectionMatch, setIsSidebarOpen } = useContext(AppContext);
+  const { 
+    currentUser, activeDrawerSession, setActiveDrawerSession, 
+    activeConnectionMatch, setActiveConnectionMatch, setIsSidebarOpen 
+  } = useContext(AppContext);
+
+  const [isCommandOpen, setIsCommandOpen] = useState(false);
+
+  // Global Ctrl+K Listener
+  useEffect(() => {
+    const handleGlobalKeys = (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsCommandOpen(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleGlobalKeys);
+    return () => window.removeEventListener('keydown', handleGlobalKeys);
+  }, []);
 
   return (
     <div className="app-container">
@@ -106,6 +125,10 @@ const MainLayout = ({ children }) => {
           onClose={() => setActiveConnectionMatch(null)}
         />
       )}
+      <CommandPalette 
+        isOpen={isCommandOpen} 
+        onClose={() => setIsCommandOpen(false)} 
+      />
       <AIChatFAB />
     </div>
   );
@@ -134,6 +157,7 @@ const App = () => {
     <ErrorBoundary>
       <AppProvider>
         <Router>
+          <a href="#main-content" className="skip-link">Skip to main content</a>
           <MainLayout>
             <Suspense fallback={<RouteLoader />}>
               <Routes>

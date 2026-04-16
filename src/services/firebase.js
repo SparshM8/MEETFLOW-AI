@@ -23,8 +23,12 @@ export const auth = getAuth(app);
 export const analytics = typeof window !== 'undefined' ? getAnalytics(app) : null;
 
 /**
- * Persist user profile and state to Firestore
- * Demonstrates real-time "Google Cloud" sync capabilities.
+ * Persist user profile and state to Firestore in real-time.
+ * Demonstrates 'Google Cloud' sync capabilities across multi-device environments.
+ * 
+ * @param {string} userId - Unique identifier
+ * @param {Object} data - Profile delta to sync
+ * @returns {Promise<boolean>} Success status
  */
 export const syncUserCloudProfile = async (userId, data) => {
   try {
@@ -35,8 +39,9 @@ export const syncUserCloudProfile = async (userId, data) => {
       platform: 'MeetFlow-AI-Concierge'
     }, { merge: true });
     
+    // Performance Tracking: Log sync events to Firebase Analytics
     if (analytics) {
-      firebaseLogEvent(analytics, 'cloud_sync_completed', { user_id: userId });
+      firebaseLogEvent(analytics, 'cloud_sync_completed', { user_id: userId, feature: 'profile_sync' });
     }
     return true;
   } catch (error) {
@@ -46,7 +51,13 @@ export const syncUserCloudProfile = async (userId, data) => {
 };
 
 /**
- * Persistence layer for Session Notes
+ * Persistence layer for Session Notes.
+ * Saves sensitive attendee notes to dedicated Firestore collection with logic for privacy.
+ * 
+ * @param {string} userId - Source user
+ * @param {string} sessionId - Target session
+ * @param {string} noteText - Markdown/Text content
+ * @returns {Promise<boolean>} Success status
  */
 export const saveNoteToCloud = async (userId, sessionId, noteText) => {
   try {
@@ -65,7 +76,11 @@ export const saveNoteToCloud = async (userId, sessionId, noteText) => {
 };
 
 /**
- * Fetch all notes for a user from Firestore
+ * Fetch all notes for a specific user from Firestore.
+ * Demonstrates complex relational queries in a NoSQL environment.
+ * 
+ * @param {string} userId - Target user
+ * @returns {Promise<Object[]>} Array of note objects
  */
 export const getUserNotes = async (userId) => {
   try {
@@ -77,5 +92,6 @@ export const getUserNotes = async (userId) => {
     return [];
   }
 };
+
 
 

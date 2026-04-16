@@ -6,6 +6,7 @@ import {
 import { AppContext } from '../context/AppContext';
 import { generateMatchExplanation } from '../utils/matchmaking';
 import MeetingPrep from './MeetingPrep';
+import ReasoningChain from './ReasoningChain';
 import Skeleton from './Skeleton';
 import './MatchCard.css';
 
@@ -116,18 +117,23 @@ const MatchCard = ({ match }) => {
 
           {showWhy && (
             <div className="why-panel animate-fade-in">
-              {signals.map((sig, i) => (
-                <div key={i} className={`signal-row ${SIGNAL_COLORS[sig.strength]}`}>
-                  <div className="signal-icon-wrap">
-                    {SIGNAL_ICONS[sig.type]}
+              <ReasoningChain match={match} currentUser={currentUser} />
+              
+              <div className="mt-6 pt-4 border-t border-glass">
+                {signals.map((sig, i) => (
+                  <div key={i} className={`signal-row ${SIGNAL_COLORS[sig.strength]}`}>
+                    <div className="signal-icon-wrap">
+                      {SIGNAL_ICONS[sig.type]}
+                    </div>
+                    <div className="signal-text">
+                      <span className="signal-label">{sig.label}</span>
+                      <span className="signal-value">{sig.value}</span>
+                    </div>
+                    <div className={`signal-dot ${SIGNAL_COLORS[sig.strength]}`}></div>
                   </div>
-                  <div className="signal-text">
-                    <span className="signal-label">{sig.label}</span>
-                    <span className="signal-value">{sig.value}</span>
-                  </div>
-                  <div className={`signal-dot ${SIGNAL_COLORS[sig.strength]}`}></div>
-                </div>
-              ))}
+                ))}
+              </div>
+
               {match.matchDetails.score >= 60 && (
                 <div className="match-confidence-breakdown mt-4">
                   <div className="flex-between mb-1">

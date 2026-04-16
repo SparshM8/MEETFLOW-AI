@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AppContext } from '../context/AppContext';
 import { X, Clock, MapPin, Tag, UserRound, CheckCircle2, AlertCircle, Sparkles, Building2, ChevronDown, ChevronUp, Target, Users, NotebookPen, CalendarClock } from 'lucide-react';
 import { generateICS } from '../utils/calendar';
+import PulseMetrics from './PulseMetrics';
 import './SessionDrawer.css';
 
 const SessionDrawer = ({ sessionId, onClose }) => {
@@ -16,28 +17,52 @@ const SessionDrawer = ({ sessionId, onClose }) => {
     [sessionId, sessions]
   );
 
-  // Handle keyboard close while drawer is open.
-  useEffect(() => {
-    const handleEsc = (e) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleEsc);
-    return () => window.removeEventListener('keydown', handleEsc);
-  }, [onClose]);
-
+  // Focus Trap Logic
   useEffect(() => {
     if (!session) return;
 
     triggerRef.current = document.activeElement;
     const originalOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    drawerRef.current?.focus();
+    
+    // Explicit focus on drawer content
+    const focusTimer = setTimeout(() => drawerRef.current?.focus(), 50);
+
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') onClose();
+      
+      if (e.key === 'Tab') {
+        const focusableElements = drawerRef.current?.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (!focusableElements || focusableElements.length === 0) return;
+        
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) { // Shift + Tab
+          if (document.activeElement === firstElement) {
+            e.preventDefault();
+            lastElement.focus();
+          }
+        } else { // Tab
+          if (document.activeElement === lastElement) {
+            e.preventDefault();
+            firstElement.focus();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeydown);
 
     return () => {
+      clearTimeout(focusTimer);
       document.body.style.overflow = originalOverflow;
+      window.removeEventListener('keydown', handleKeydown);
       triggerRef.current?.focus?.();
     };
-  }, [session]);
+  }, [session, onClose]);
 
   if (!session) return null;
 
@@ -76,6 +101,7 @@ const SessionDrawer = ({ sessionId, onClose }) => {
 
           <div className="drawer-section mt-8">
             <h3 className="section-title">About this Session</h3>
+            {session.status === 'Filling Fast' && <PulseMetrics sessionTitle={session.title} />}
             <p className="mt-2 text-secondary leading-relaxed">{session.description}</p>
           </div>
 

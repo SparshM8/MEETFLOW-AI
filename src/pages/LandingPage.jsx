@@ -6,13 +6,18 @@ import {
   Sparkles, Zap, CalendarDays, Share2, 
   ArrowRight, ShieldCheck, Target, Users, BookOpen
 } from 'lucide-react';
+import GoogleSignIn from '../components/GoogleSignIn';
 import './LandingPage.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
 
+  const handleAuthSuccess = (userData) => {
+    // In a real app, this would be the Firebase callback
+    navigate('/onboarding', { state: { googleUser: userData } });
+  };
+
   const handleGetStarted = () => navigate('/onboarding');
-  const handleSignIn = () => navigate('/onboarding'); // Mock sign-in
 
   return (
     <div className="landing-page animate-fade-in">
@@ -33,7 +38,6 @@ const LandingPage = () => {
         </nav>
 
         <div className="landing-actions">
-          <button className="btn btn-ghost" onClick={handleSignIn} aria-label="Sign in to your account">Sign In</button>
           <button className="btn btn-primary" onClick={handleGetStarted} aria-label="Get started with MeetFlow AI">Get Started</button>
         </div>
       </header>
@@ -50,9 +54,12 @@ const LandingPage = () => {
             MeetFlow AI dynamically matches you with high-value connections, builds your optimal event agenda, and reroutes you in real-time when sessions go full.
           </p>
           
-          <button className="btn btn-primary hero-cta-btn shadow-glow" onClick={handleGetStarted} aria-label="Start your AI concierge journey">
-            Get Started <ArrowRight size={20} className="ml-2" aria-hidden="true" />
-          </button>
+          <div className="hero-cta-group">
+            <GoogleSignIn onAuthSuccess={handleAuthSuccess} />
+            <button className="btn btn-outline hero-cta-btn" onClick={handleGetStarted} aria-label="Start your AI concierge journey">
+              Enter without Sign-In <ArrowRight size={18} className="ml-2" aria-hidden="true" />
+            </button>
+          </div>
 
           <div className="hero-cards">
             <div className="hero-card animate-slide-up" style={{ animationDelay: '0.1s' }}>

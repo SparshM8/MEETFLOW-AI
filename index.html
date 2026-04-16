@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Security: Production-Grade CSP (Institution Hardened) -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://apis.google.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' https://generativelanguage.googleapis.com https://*.firebaseio.com https://*.googleapis.com;" />
+
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Google Fonts Mastery -->
@@ -12,29 +15,28 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Primary SEO -->
-    <title>MeetFlow AI — AI Event Concierge for Smarter Networking</title>
-    <meta name="description" content="MeetFlow AI is an AI-powered event concierge that helps conference and hackathon attendees find high-value connections, optimize their schedule, and adapt in real time when sessions change." />
-    <meta name="keywords" content="event networking, AI matchmaking, conference planner, hackathon tool, agenda optimization, icebreaker generator" />
-    <meta name="author" content="MeetFlow AI" />
+    <title>MeetFlow AI — Official AI Event Concierge</title>
+    <meta name="description" content="MeetFlow AI is an production-ready AI event concierge: smart matchmaking, personalized icebreakers, and real-time agenda optimization powered by Google Gemini." />
+    <meta name="keywords" content="AI networking, Google Gemini hackathon, event management, real-time agenda, smart matchmaking" />
 
-    <!-- Open Graph -->
+    <!-- Open Graph (Rich Social Presence) -->
     <meta property="og:type" content="website" />
     <meta property="og:title" content="MeetFlow AI — AI Event Concierge" />
-    <meta property="og:description" content="Find the right people, attend the right sessions, and adapt in real time. AI-powered networking and agenda planning for events." />
+    <meta property="og:description" content="Smarter networking powered by Gemini. Real-time adaptation for hackathons and conferences." />
+    <meta property="og:image" content="https://meetflow-ai.vercel.app/og-banner.png" />
     <meta property="og:site_name" content="MeetFlow AI" />
 
-    <!-- Twitter -->
+    <!-- Twitter Card (Viral Optimized) -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="MeetFlow AI — AI Event Concierge" />
-    <meta name="twitter:description" content="AI-powered event concierge: smart matchmaking, personalized icebreakers, agenda optimization, and real-time rerouting." />
+    <meta name="twitter:description" content="AI-powered matchmaking and real-time agenda planning. Build with Google Gemini." />
+    <meta name="twitter:image" content="https://meetflow-ai.vercel.app/og-banner.png" />
 
-    <!-- Theme -->
+    <!-- Performance & Theme -->
     <meta name="theme-color" content="#06060c" />
     <meta name="color-scheme" content="dark" />
-    
-    <!-- Meta for Social -->
-    <meta property="og:image" content="https://meetflow-ai.vercel.app/og-image.png" />
-    <meta name="twitter:image" content="https://meetflow-ai.vercel.app/og-image.png" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
     <style>
       :root {
