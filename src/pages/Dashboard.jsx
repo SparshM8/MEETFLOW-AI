@@ -64,7 +64,7 @@ const AIBriefing = ({ currentUser, topMatches, topRecommended, userAgenda, netwo
       </p>
 
       <div className="briefing-insights">
-        {insights.map((ins, i) => (
+        {insights.length > 0 ? insights.map((ins, i) => (
           <div key={i} className={`briefing-insight ${ins.color}`}>
             <div className="insight-icon-wrap">{ins.icon}</div>
             <div className="insight-body">
@@ -73,7 +73,12 @@ const AIBriefing = ({ currentUser, topMatches, topRecommended, userAgenda, netwo
               {ins.sub && <span className="insight-sub">{ins.sub}</span>}
             </div>
           </div>
-        ))}
+        )) : (
+          /* Skeleton Loader */
+          [1,2,3].map(i => (
+            <div key={i} className="briefing-insight skeleton-shimmer" style={{ height: '60px', opacity: 0.1 }}></div>
+          ))
+        )}
       </div>
     </div>
   );
@@ -227,6 +232,29 @@ const Dashboard = () => {
 
           {/* New Live Feed Section */}
           <section className="mt-6">
+            <div className="section-header mb-3">
+              <h2 className="section-title">
+                <Globe size={18} className="text-info" />
+                Live Event Pulse
+              </h2>
+              <span className="live-pulse-dot"></span>
+            </div>
+            
+            <div className="crowd-pulse-card card mb-4">
+              <div className="pulse-meter">
+                <div className="pulse-bar" style={{ width: '85%' }}></div>
+              </div>
+              <div className="flex-between mt-2">
+                <span className="text-xs text-secondary font-medium uppercase tracking-wider">Crowd Sentiment</span>
+                <span className="text-xs text-accent-primary font-bold">⚡ High Energy</span>
+              </div>
+              <p className="text-xs text-tertiary mt-3 leading-relaxed">
+                <Sparkles size={11} className="inline mr-1 text-accent-secondary" />
+                AI Analysis: A massive influx of interest in <strong>Next-Gen Architecture</strong> sessions has been detected. 
+                Recommended networking focus: <em>Cloud Infrastructure</em>.
+              </p>
+            </div>
+            
             <EventFeed />
           </section>
         </div>

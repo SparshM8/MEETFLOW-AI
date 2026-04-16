@@ -252,3 +252,45 @@
   .greeting            { font-size: 1.65rem; }
   .ai-briefing-card    { padding: 1.1rem 1.25rem; }
 }
+
+/* Crowd Pulse */
+.crowd-pulse-card {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(139, 92, 246, 0.05));
+  border: 1px solid rgba(139, 92, 246, 0.2);
+}
+
+.pulse-meter {
+  height: 4px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.pulse-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+  box-shadow: 0 0 10px var(--accent-glow);
+  animation: pulseWidth 3s ease-in-out infinite alternate;
+}
+
+@keyframes pulseWidth {
+  from { opacity: 0.6; width: 75%; }
+  to { opacity: 1; width: 85%; }
+}
+
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--danger);
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 8px;
+  box-shadow: 0 0 8px var(--danger);
+  animation: blink pulse-blink 1.5s infinite;
+}
+
+@keyframes pulse-blink {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}

@@ -68,6 +68,11 @@ export const AppProvider = ({ children }) => {
   const [networkRoster, setNetworkRoster] = useState(saved.networkRoster || []);
   const [sessionNotes, setSessionNotes] = useState(saved.sessionNotes || {}); // { sessionId: "note text" }
   const [matchFeedback, setMatchFeedback] = useState(saved.matchFeedback || {}); // { matchId: 'positive' | 'negative' }
+  const [privacySettings, setPrivacySettings] = useState(saved.privacySettings || {
+    stealthMode: false,
+    matchSensitivity: 'balanced', // 'strict' | 'balanced' | 'discovery'
+    allowAnalytics: true
+  });
 
   const [activeDrawerSession, setActiveDrawerSession] = useState(null);
   const [activeConnectionMatch, setActiveConnectionMatch] = useState(null);
@@ -106,8 +111,8 @@ export const AppProvider = ({ children }) => {
 
   /* ── Persistence: save on every relevant state change ── */
   useEffect(() => {
-    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback });
-  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback]);
+    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback, privacySettings });
+  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback, privacySettings]);
 
   /* ── Toast helpers ── */
   const showToast = (message, type = 'success') => {
@@ -264,6 +269,20 @@ export const AppProvider = ({ children }) => {
     showToast(type === 'positive' ? 'Great! Gemini will prioritize similar matches.' : 'Noted. Refining your match signals...', 'info');
   };
 
+  const wipeAILearning = () => {
+    setMatchFeedback({});
+    showToast('AI learning data erased successfully', 'warning');
+  };
+
+  const updatePrivacy = (key, value) => {
+    setPrivacySettings(prev => ({ ...prev, [key]: value }));
+    const msgs = {
+      stealthMode: value ? 'Incognito: Your profile is now semi-private.' : 'Visibility restored to full.',
+      matchSensitivity: `Match Algorithm set to ${value}.`
+    };
+    showToast(msgs[key] || 'Privacy settings updated', 'info');
+  };
+
   /* ── Auth Actions ── */
   const logOut = () => {
     localStorage.removeItem(STORAGE_KEY);
@@ -291,6 +310,7 @@ export const AppProvider = ({ children }) => {
       isSidebarOpen, setIsSidebarOpen,
       matchFeedback, handleMatchFeedback,
       eventStats,
+      privacySettings, updatePrivacy, wipeAILearning,
       completeOnboarding, updateUser, acceptReroute, dismissReroute,
       rsvpToSession, removeFromAgenda, simulateWaitlistPromotion, handleNetworkingState, logOut, resetApp,
     }}>

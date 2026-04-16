@@ -3,7 +3,8 @@ import { AppContext } from '../context/AppContext';
 import {
   Edit3, Check, X, ShieldCheck, Link2, Mail, Building2,
   BookOpen, Clock, Users, CalendarDays, BarChart2, Sparkles,
-  Globe, Briefcase, Target, Zap, RotateCcw, QrCode
+  Globe, Briefcase, Target, Zap, RotateCcw, QrCode,
+  Eye, EyeOff, Shield, Trash2, Sliders
 } from 'lucide-react';
 import './Profile.css';
 
@@ -73,7 +74,10 @@ const SelectionPills = ({ label, helper, max, values, presets, onChange }) => (
 );
 
 const Profile = () => {
-  const { currentUser, updateUser, userAgenda, networkRoster, resetApp } = useContext(AppContext);
+  const { 
+    currentUser, updateUser, userAgenda, networkRoster, resetApp,
+    privacySettings, updatePrivacy, wipeAILearning
+  } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
   const [activeTab, setActiveTab] = useState('overview');
@@ -109,7 +113,7 @@ const Profile = () => {
   // Mock skill levels based on order
   const skillLevels = [92, 78, 85];
 
-  const TABS = ['overview', 'network', 'activity'];
+  const TABS = ['overview', 'network', 'activity', 'privacy'];
 
   return (
     <div className="profile-page animate-fade-in">
@@ -357,39 +361,78 @@ const Profile = () => {
         </div>
       )}
 
-      {activeTab === 'activity' && (
+      {activeTab === 'privacy' && (
         <div className="profile-tab-panel animate-fade-in">
-          <div className="activity-timeline card">
-            <h3 className="card-label mb-6">Recent Activity</h3>
-            <div className="activity-list">
-              <div className="activity-item">
-                <div className="activity-dot bg-success"></div>
-                <div className="activity-content">
-                  <p className="text-sm text-primary">Profile created and workspace initialized.</p>
-                  <span className="text-xs text-tertiary">Today · Onboarding</span>
+          <div className="card privacy-hub-card">
+            <div className="card-header-row mb-6">
+              <h3 className="card-label">
+                <Shield size={18} className="text-success" />
+                AI Privacy & Trust Hub
+              </h3>
+              <span className="badge badge-ai">Safe Mode Active</span>
+            </div>
+
+            <div className="privacy-settings-list">
+              {/* Stealth Mode */}
+              <div className="privacy-setting-item">
+                <div className="setting-info">
+                  <h4 className="flex items-center gap-2">
+                    {privacySettings.stealthMode ? <EyeOff size={16} /> : <Eye size={16} />}
+                    Stealth Mode
+                  </h4>
+                  <p className="text-xs text-tertiary">When active, your full profile is only visible to high-value matches (80%+ score).</p>
+                </div>
+                <div 
+                  className={`toggle-switch ${privacySettings.stealthMode ? 'active' : ''}`}
+                  onClick={() => updatePrivacy('stealthMode', !privacySettings.stealthMode)}
+                >
+                  <div className="toggle-knob"></div>
                 </div>
               </div>
-              {userAgenda.map(session => (
-                <div key={session.id} className="activity-item">
-                  <div className="activity-dot bg-primary"></div>
-                  <div className="activity-content">
-                    <p className="text-sm text-primary">RSVP'd to <strong>{session.title}</strong></p>
-                    <span className="text-xs text-tertiary">{session.time} · {session.location}</span>
-                  </div>
+
+              {/* Match Sensitivity */}
+              <div className="privacy-setting-item">
+                <div className="setting-info">
+                  <h4 className="flex items-center gap-2"><Sliders size={16} /> Match Sensitivity</h4>
+                  <p className="text-xs text-tertiary">Controls how strict the AI is when suggesting connections.</p>
                 </div>
-              ))}
-              {networkRoster.map(entry => (
-                <div key={entry.matchId} className="activity-item">
-                  <div className="activity-dot bg-accent"></div>
-                  <div className="activity-content">
-                    <p className="text-sm text-primary">Sent intro request to a match — <em>{entry.status}</em></p>
-                    <span className="text-xs text-tertiary">Today · Networking</span>
-                  </div>
+                <select 
+                  className="privacy-select"
+                  value={privacySettings.matchSensitivity}
+                  onChange={(e) => updatePrivacy('matchSensitivity', e.target.value)}
+                >
+                  <option value="strict">Strict (High Synergy)</option>
+                  <option value="balanced">Balanced (Default)</option>
+                  <option value="discovery">Discovery (Wide Reach)</option>
+                </select>
+              </div>
+
+              {/* Analytics */}
+              <div className="privacy-setting-item">
+                <div className="setting-info">
+                  <h4 className="flex items-center gap-2"><BarChart2 size={16} /> Usage Analytics</h4>
+                  <p className="text-xs text-tertiary">Allow MeetFlow to use anonymous usage data to improve the global event pulse.</p>
                 </div>
-              ))}
-              {userAgenda.length === 0 && networkRoster.length === 0 && (
-                <p className="text-secondary text-sm">No recent activity. Start by saving a session or connecting with a match.</p>
-              )}
+                <div 
+                  className={`toggle-switch ${privacySettings.allowAnalytics ? 'active' : ''}`}
+                  onClick={() => updatePrivacy('allowAnalytics', !privacySettings.allowAnalytics)}
+                >
+                  <div className="toggle-knob"></div>
+                </div>
+              </div>
+            </div>
+
+            <div className="danger-zone mt-8 pt-6 border-t border-glass">
+              <h4 className="text-danger flex items-center gap-2 mb-2"><Trash2 size={16} /> Danger Zone</h4>
+              <p className="text-xs text-tertiary mb-4">Erasing your AI learning data will reset all networking weights. This action is irreversible.</p>
+              <button 
+                className="btn btn-outline text-danger w-full sm:w-auto"
+                onClick={() => {
+                  if(window.confirm("Confirm: Wipe all AI matchmaking weights?")) wipeAILearning();
+                }}
+              >
+                Wipe AI Learning Data
+              </button>
             </div>
           </div>
         </div>
