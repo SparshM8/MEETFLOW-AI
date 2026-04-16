@@ -94,9 +94,14 @@ const ProtectedRoute = ({ children }) => {
 };
 
 const RouteLoader = () => (
-  <div className="dashboard-gate" role="status" aria-live="polite">
-    <h2 className="text-primary">Loading your page...</h2>
-    <p className="text-secondary mt-2 text-sm">Preparing your concierge experience.</p>
+  <div className="dashboard-gate flex-col gap-4" role="status" aria-live="polite">
+    <div className="loader-pulse-ring">
+      <Sparkles size={32} className="text-accent-primary animate-pulse" />
+    </div>
+    <div className="text-center">
+      <h2 className="text-xl font-bold text-primary">MeetFlow AI</h2>
+      <p className="text-secondary text-sm">Fine-tuning your event journey...</p>
+    </div>
   </div>
 );
 
