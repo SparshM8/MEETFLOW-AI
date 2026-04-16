@@ -26,8 +26,27 @@
     <!-- Theme -->
     <meta name="theme-color" content="#06060c" />
     <meta name="color-scheme" content="dark" />
+    
+    <!-- Meta for Social -->
+    <meta property="og:image" content="https://meetflow-ai.vercel.app/og-image.png" />
+    <meta name="twitter:image" content="https://meetflow-ai.vercel.app/og-image.png" />
+    
+    <style>
+      .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 0;
+        background: #6366f1;
+        color: white;
+        padding: 8px;
+        z-index: 100;
+        transition: top 0.3s;
+      }
+      .skip-link:focus { top: 0; }
+    </style>
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

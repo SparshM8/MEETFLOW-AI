@@ -4,6 +4,7 @@ import { getRecommendedAgenda, getAlternativeSession, evaluateConflict } from '.
 import { detectConflicts } from '../utils/sessionUtils';
 import { CheckCircle2, AlertTriangle, Info, X, Zap } from 'lucide-react';
 import { saveNoteToCloud } from '../services/firebase';
+import { trackRSVP, trackConnection, trackReroute } from '../services/analytics';
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const AppContext = createContext();
@@ -146,6 +147,7 @@ export const AppProvider = ({ children }) => {
           ...prev.filter(s => s.id !== rerouteAlert.originalSession.id),
           { ...rerouteAlert.newSession, isAlternate: true }
         ]);
+        trackReroute(rerouteAlert.originalSession.id, rerouteAlert.newSession.id);
         showToast(`Rerouted to: ${rerouteAlert.newSession.title}`, 'info');
       } else {
         showToast('Recommendation refreshed!', 'info');
@@ -172,6 +174,7 @@ export const AppProvider = ({ children }) => {
     if (session.status === 'Full') {
       if (!waitlist.find(s => s.id === session.id)) {
         setWaitlist(prev => [...prev, session]);
+        trackRSVP(session.id, 'waitlist');
         showToast(`Added to waitlist: ${session.title}`, 'warning');
       }
     } else {
@@ -188,6 +191,7 @@ export const AppProvider = ({ children }) => {
         }
 
         setUserAgenda(prev => [...prev, session]);
+        trackRSVP(session.id, 'confirmed');
         showToast(`RSVP confirmed: ${session.title}`, 'success');
       }
     }
@@ -215,6 +219,7 @@ export const AppProvider = ({ children }) => {
     } else {
       setNetworkRoster(prev => [...prev, { matchId, status }]);
     }
+    trackConnection(matchId, status);
     const msgMap = {
       requested: 'Intro request sent!',
       saved: 'Saved to your network roster',

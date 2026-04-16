@@ -13,7 +13,9 @@ import MatchDetails from './pages/MatchDetails';
 import Profile from './pages/Profile';
 import Explore from './pages/Explore';
 import LandingPage from './pages/LandingPage';
+import TermsPrivacy from './pages/TermsPrivacy';
 import AIChatFAB from './components/AIChatFAB';
+import { GAPageView } from './services/analytics';
 
 import './App.css';
 
@@ -31,10 +33,11 @@ class ErrorBoundary extends React.Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem' }}>
-          <h2 style={{ color: 'var(--text-primary)' }}>Something went wrong. Please refresh the page.</h2>
-          <button onClick={() => window.location.reload()} style={{ padding: '0.75rem 1.5rem', background: 'var(--accent-primary)', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}>
-            Refresh
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', flexDirection: 'column', gap: '1rem', background: '#06060c', color: 'white' }}>
+          <h2 style={{ fontSize: '1.5rem' }}>Unexpected Error Detected</h2>
+          <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '400px', textAlign: 'center' }}>MeetFlow AI encountered an issue. Our concierge is working on a fix.</p>
+          <button onClick={() => window.location.reload()} style={{ padding: '0.8rem 2rem', background: '#6366f1', color: 'white', border: 'none', borderRadius: '12px', cursor: 'pointer', fontWeight: 'bold', boxShadow: '0 4px 14px rgba(99,102,241,0.4)' }}>
+            Restart Application
           </button>
         </div>
       );
@@ -50,7 +53,7 @@ const MainLayout = ({ children }) => {
     <div className="app-container">
       {currentUser && <Navigation />}
 
-      <main className={`main-content ${currentUser ? 'with-nav' : ''}`}>
+      <main id="main-content" className={`main-content ${currentUser ? 'with-nav' : ''}`}>
         {currentUser && (
           <div className="mobile-header flex-between">
             <h2 className="brand-text gradient-text" style={{ fontSize: '1.25rem' }}>MeetFlow AI</h2>
@@ -145,6 +148,7 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
+                <Route path="/privacy" element={<TermsPrivacy />} />
                 {/* Fallback */}
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

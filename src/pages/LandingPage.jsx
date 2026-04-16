@@ -30,8 +30,8 @@ const LandingPage = () => {
         </nav>
 
         <div className="landing-actions">
-          <button className="btn btn-ghost" onClick={handleSignIn}>Sign In</button>
-          <button className="btn btn-primary" onClick={handleGetStarted}>Get Started</button>
+          <button className="btn btn-ghost" onClick={handleSignIn} aria-label="Sign in to your account">Sign In</button>
+          <button className="btn btn-primary" onClick={handleGetStarted} aria-label="Get started with MeetFlow AI">Get Started</button>
         </div>
       </header>
 
@@ -47,8 +47,8 @@ const LandingPage = () => {
             MeetFlow AI dynamically matches you with high-value connections, builds your optimal event agenda, and reroutes you in real-time when sessions go full.
           </p>
           
-          <button className="btn btn-primary hero-cta-btn shadow-glow" onClick={handleGetStarted}>
-            Get Started <ArrowRight size={20} className="ml-2" />
+          <button className="btn btn-primary hero-cta-btn shadow-glow" onClick={handleGetStarted} aria-label="Start your AI concierge journey">
+            Get Started <ArrowRight size={20} className="ml-2" aria-hidden="true" />
           </button>
 
           <div className="hero-cards">
@@ -162,9 +162,9 @@ const LandingPage = () => {
             <div className="footer-col">
               <h4>Platform</h4>
               <ul>
-                <li><a href="#">Privacy</a></li>
-                <li><a href="#">Terms</a></li>
-                <li><a href="#">Security</a></li>
+                <li><a href="/privacy">Privacy</a></li>
+                <li><a href="/privacy">Terms</a></li>
+                <li><a href="/privacy">Security</a></li>
               </ul>
             </div>
             <div className="footer-col">

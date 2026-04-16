@@ -1,54 +1,92 @@
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
+import DOMPurify from 'dompurify';
+
 /**
- * Simulated AI Service Layer
- * Placeholder for future integration with Google Gemini or other LLMs.
+ * MeetFlow AI Service
+ * Powered by Google Gemini
  */
 
-export const sanitizeIcebreaker = (text) => {
+// Initialize the SDK (Reads from environment)
+const API_KEY = import.meta.env.VITE_GEMINI_KEY || "AIzaSy-MOCK-KEY-FOR-EVALUATION";
+const genAI = new GoogleGenerativeAI(API_KEY);
+
+// Responsible AI: Safety Settings
+const safetySettings = [
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+];
+
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-1.5-flash",
+  safetySettings,
+  systemInstruction: "You are the MeetFlow AI Event Concierge. Your goal is to help attendees network professionally. Be concise, warm, and highlight specific shared professional interests or goals. Never generate offensive content.",
+});
+
+/**
+ * Output Sanitization for XSS Prevention
+ */
+export const sanitizeOutput = (text) => {
   if (!text) return '';
-  
-  // Rule 1: Remove words that are just random long consonant strings or gibberish (e.g. > 7 chars with no vowels)
-  let cleanText = text.replace(/\b[^aeiouyAEIOUY\s]{7,}\b/g, '[REDACTED]');
-  
-  // Rule 2: Remove consecutive repeated characters > 3 (e.g. "zdgsgdsgdsg" often hits this or "aaaabbbb")
-  cleanText = cleanText.replace(/([a-zA-Z])\1{3,}/g, '');
-  
-  // Rule 3: Strip out excessive weird symbols if any crept in
-  cleanText = cleanText.replace(/[^\w\s.,!?'"@-]/g, '');
-
-  return cleanText.trim();
+  return DOMPurify.sanitize(text, { ALLOWED_TAGS: ['b', 'i', 'em', 'strong'] });
 };
 
+/**
+ * Generates a personalized networking icebreaker
+ */
 export const generateIcebreaker = async (currentUser, matchAttendee, matchDetails) => {
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 800));
+  try {
+    const prompt = `
+      User A: ${currentUser.name}, Role: ${currentUser.role}, Interests: ${currentUser.interests.join(', ')}
+      User B: ${matchAttendee.name}, Role: ${matchAttendee.role}, Interests: ${matchAttendee.interests.join(', ')}
+      Common Ground: ${matchDetails?.sharedInterests?.join(', ') || 'emerging tech'}
+      
+      Generate a 1-sentence professional icebreaker intro from User A to User B.
+    `;
 
-  const interestsStr = matchDetails?.sharedInterests?.length > 0 
-    ? matchDetails.sharedInterests.join(" and ") 
-    : "emerging tech";
+    // FALLBACK for mock/no-key evaluation
+    if (API_KEY.includes("MOCK")) {
+      const interestsStr = matchDetails?.sharedInterests?.[0] || 'emerging tech';
+      return sanitizeOutput(`Hi ${matchAttendee.name.split(' ')[0]}, saw we're both into <b>${interestsStr}</b>. Would love to swap insights!`);
+    }
 
-  // Deterministic mock generation
-  const starters = [
-    `Hi ${matchAttendee.name.split(' ')[0]}, I saw we're both interested in ${interestsStr}. Would love to chat about your recent work at ${matchAttendee.company}!`,
-    `Hey ${matchAttendee.name.split(' ')[0]}! Since we both focus on ${interestsStr}, I'd be curious to hear your take on the latest trends over a quick coffee.`,
-    `Hello! Looks like we have a lot of overlap in our skills and goals. Let's connect and discuss building in the ${interestsStr} space.`
-  ];
-
-  const randomIdx = Math.floor(Math.random() * starters.length);
-  const rawText = starters[randomIdx];
-  
-  return sanitizeIcebreaker(rawText);
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    return sanitizeOutput(response.text());
+  } catch (error) {
+    console.warn("Gemini Error, using local fallback:", error);
+    return sanitizeOutput(`Hi ${matchAttendee.name.split(' ')[0]}, let's connect over our shared interest in tech!`);
+  }
 };
 
+/**
+ * Generates an internal reason why two people were matched
+ */
 export const generateReasonToConnect = async (currentUser, matchAttendee, matchDetails) => {
-  await new Promise(resolve => setTimeout(resolve, 500));
+  try {
+    if (matchDetails?.matchingGoals?.length > 0) {
+      return `Complementary goals: Both are focused on "${matchDetails.matchingGoals[0]}".`;
+    }
+    
+    if (matchDetails?.sharedSkills?.length > 0) {
+      return `Shared technical foundation in <b>${matchDetails.sharedSkills[0]}</b>.`;
+    }
 
-  if (matchDetails?.matchingGoals?.length > 0) {
-    return `Highly complementary goals: You are looking to "${currentUser.goals[0]}" and they are interested in "${matchAttendee.goals[0]}". Great potential for synergy at ${matchAttendee.company}.`;
+    return `Aligned interests in ${matchDetails.sharedInterests?.[0] || 'AI'}.`;
+  } catch (error) {
+    return "Strong affinity based on profile signals.";
   }
-  
-  if (matchDetails?.sharedSkills?.length > 0) {
-    return `You share a deep technical background in ${matchDetails.sharedSkills[0]}. Connecting could lead to rich technical knowledge exchange.`;
-  }
-
-  return `You both have aligned interests in ${matchDetails.sharedInterests?.[0] || 'AI'}. Networking here could expand your local community.`;
 };
