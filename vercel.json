@@ -1,7 +1,12 @@
 {
+  "cleanUrls": true,
   "rewrites": [
     {
-      "source": "/(.*)",
+      "source": "/assets/(.*)",
+      "destination": "/assets/$1"
+    },
+    {
+      "source": "/((?!assets/|favicon.ico|manifest.json|sw.js).*)",
       "destination": "/index.html"
     }
   ]

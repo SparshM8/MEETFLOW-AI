@@ -13,6 +13,30 @@ const MatchDetails = lazy(() => import('./pages/MatchDetails'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Explore = lazy(() => import('./pages/Explore'));
 const LandingPage = lazy(() => import('./pages/LandingPage'));
+
+/**
+ * Handle Chunk Load Errors (Google Best Practice)
+ * Prevents blank screens when a new version is deployed.
+ */
+const safeLazy = (importFn) => {
+  return lazy(() => 
+    importFn().catch((error) => {
+      console.error('MatchFlow Chunk Load Error:', error);
+      if (error.name === 'ChunkLoadError' || error.message.includes('Loading chunk')) {
+        window.location.reload();
+      }
+      throw error;
+    })
+  );
+};
+
+const LazyDashboard = safeLazy(() => import('./pages/Dashboard'));
+const LazyAgenda = safeLazy(() => import('./pages/Agenda'));
+const LazyProfile = safeLazy(() => import('./pages/Profile'));
+const LazyExplore = safeLazy(() => import('./pages/Explore'));
+const LazyMatchDetails = safeLazy(() => import('./pages/MatchDetails'));
+const LazyOnboarding = safeLazy(() => import('./pages/Onboarding'));
+const LazyLanding = safeLazy(() => import('./pages/LandingPage'));
 import NetworkGraph from './components/NetworkGraph';
 import ConciergeBot from './components/ConciergeBot';
 import TermsPrivacy from './pages/TermsPrivacy';
@@ -114,13 +138,13 @@ const App = () => {
             <Suspense fallback={<RouteLoader />}>
               <Routes>
                 {/* ... routes ... */}
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/onboarding" element={<Onboarding />} />
+                <Route path="/" element={<LazyLanding />} />
+                <Route path="/onboarding" element={<LazyOnboarding />} />
                 <Route
                   path="/dashboard"
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <LazyDashboard />
                     </ProtectedRoute>
                   }
                 />
@@ -128,7 +152,7 @@ const App = () => {
                   path="/agenda"
                   element={
                     <ProtectedRoute>
-                      <Agenda />
+                      <LazyAgenda />
                     </ProtectedRoute>
                   }
                 />
@@ -136,7 +160,7 @@ const App = () => {
                   path="/match/:id"
                   element={
                     <ProtectedRoute>
-                      <MatchDetails />
+                      <LazyMatchDetails />
                     </ProtectedRoute>
                   }
                 />
@@ -144,7 +168,7 @@ const App = () => {
                   path="/profile"
                   element={
                     <ProtectedRoute>
-                      <Profile />
+                      <LazyProfile />
                     </ProtectedRoute>
                   }
                 />
@@ -152,7 +176,7 @@ const App = () => {
                   path="/explore"
                   element={
                     <ProtectedRoute>
-                      <Explore />
+                      <LazyExplore />
                     </ProtectedRoute>
                   }
                 />
