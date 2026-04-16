@@ -134,3 +134,23 @@ export const generateRerouteReason = async (originalSession, newSession, current
 
   return safeGenerate(prompt, RerouteReasonSchema, fallback);
 };
+
+/**
+ * Generates a one-sentence justification/reason for connecting
+ */
+export const generateReasonToConnect = async (currentUser, matchAttendee, matchDetails) => {
+  const commonInterest = matchDetails?.sharedInterests?.[0] || 'your shared focus';
+  
+  const prompt = `
+    User A: ${currentUser.name}, Goals: ${currentUser.goals?.join(', ')}
+    User B: ${matchAttendee.name}, Role: ${matchAttendee.role}, Co-Interests: ${matchAttendee.interests?.join(', ')}
+    
+    Task: Why should they connect? 1 punchy sentence. Return JSON: { reasoning: string }
+  `;
+
+  const fallback = { reasoning: `You both have a strong foundation in ${commonInterest} and complementary professional goals.` };
+  const schema = z.object({ reasoning: z.string() });
+
+  const result = await safeGenerate(prompt, schema, fallback);
+  return result.reasoning;
+};

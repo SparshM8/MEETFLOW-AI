@@ -88,7 +88,7 @@ const MatchDetails = () => {
 
       <div className="ai-insights grid-cols-2 mt-8">
         <div className="insight-card card animate-slide-down" style={{animationDelay: '100ms'}}>
-          <h3 className="insight-title"><SparklesIcon /> AI Reason to Connect</h3>
+          <h3 className="insight-title"><Sparkles size={18} className="text-secondary" /> AI Reason to Connect</h3>
           {loadingAI ? (
             <div className="loading-state"><Loader2 className="animate-spin" size={24} /> Generating...</div>
           ) : (
@@ -134,6 +134,5 @@ const MatchDetails = () => {
   );
 };
 
-const SparklesIcon = () => <Zap size={18} className="text-secondary" />; // Fallback since I forgot Sparkles import
-
+// MatchDetails component ends above
 export default MatchDetails;
