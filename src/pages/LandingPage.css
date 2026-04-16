@@ -574,8 +574,42 @@
 /* ── Responsive ── */
 @media (max-width: 1024px) {
   .landing-header { padding: 0 2rem; }
-  .hero-cards, .features-grid { grid-template-columns: 1fr; }
+  .hero-cards, .features-grid, .testimonials-grid { grid-template-columns: 1fr; }
   .timeline { flex-direction: column; gap: 3rem; }
   .timeline::before { display: none; }
-  .how-it-works, .features-section, .demo-section, .landing-footer { padding: 60px 2rem; }
+  .how-it-works, .features-section, .demo-section, .landing-footer, .testimonials-section, .pricing-section { padding: 60px 2rem; }
+  .pricing-grid { grid-template-columns: 1fr; max-width: 400px; }
+  .pricing-card.featured { transform: none; margin-top: 1rem; }
+}
+
+@media (max-width: 600px) {
+  .landing-header {
+    height: 70px;
+    padding: 0 1rem;
+  }
+  .landing-logo span {
+    display: none; /* Hide 'MeetFlow AI' text on very small screens to save space */
+  }
+  .landing-actions {
+    gap: 0.5rem;
+  }
+  .landing-actions .btn {
+    padding: 0.5rem 0.8rem;
+    font-size: 0.8rem;
+  }
+  .hero-headline {
+    font-size: 2rem;
+  }
+  .hero-subheadline {
+    font-size: 1rem;
+  }
+  .trust-bar {
+    padding: 40px 1rem;
+  }
+  .logo-strip {
+    gap: 1.5rem;
+  }
+  .mock-logo {
+    font-size: 0.9rem;
+  }
 }

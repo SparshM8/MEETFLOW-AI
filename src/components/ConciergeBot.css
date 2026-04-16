@@ -1,11 +1,11 @@
 .concierge-bot-container {
   position: fixed;
   bottom: 1.5rem;
-  right: 1.5rem;
+  left: 1.5rem;
   z-index: 1000;
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 1rem;
 }
 
@@ -130,6 +130,10 @@
 @media (max-width: 480px) {
   .concierge-menu {
     width: 280px;
-    right: 0;
+    left: 0;
+  }
+  .concierge-tip-bubble {
+    max-width: 200px; /* Thinner to avoid center buttons */
+    left: 0;
   }
 }

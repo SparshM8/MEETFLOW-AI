@@ -6,9 +6,9 @@ const NetworkGraph = ({ currentUser, matches, onSelectMatch }) => {
   const nodes = useMemo(() => {
     if (!currentUser || !matches) return [];
     
-    const centerX = 250;
-    const centerY = 250;
-    const radius = 180;
+    const centerX = 300;
+    const centerY = 300;
+    const radius = 220;
     
     // Core (User) node
     const userNode = {
@@ -25,7 +25,7 @@ const NetworkGraph = ({ currentUser, matches, onSelectMatch }) => {
       const angle = (i / Math.min(matches.length, 10)) * 2 * Math.PI;
       // Distance based on match score (closer = higher score)
       const distPercent = (100 - (m.matchDetails?.score || 90)) / 100;
-      const r = radius * (0.6 + distPercent * 0.4); 
+      const r = radius * (0.5 + distPercent * 0.4); 
       
       return {
         ...m,
@@ -40,16 +40,16 @@ const NetworkGraph = ({ currentUser, matches, onSelectMatch }) => {
 
   return (
     <div className="network-graph-container glass-panel">
-      <svg className="network-svg" viewBox="0 0 500 500">
+      <svg className="network-svg" viewBox="0 0 600 600">
         {/* Background Orbits */}
-        <circle cx="250" cy="250" r="100" className="orbit-line" />
-        <circle cx="250" cy="250" r="180" className="orbit-line-outer" />
+        <circle cx="300" cy="300" r="120" className="orbit-line" />
+        <circle cx="300" cy="300" r="220" className="orbit-line-outer" />
         
         {/* Connection Lines to ME */}
         {nodes.filter(n => !n.isMe).map(n => (
           <line 
             key={`line-${n.id}`}
-            x1="250" y1="250" 
+            x1="300" y1="300" 
             x2={n.x} y2={n.y} 
             className="graph-connection"
             strokeDasharray="4 4"
