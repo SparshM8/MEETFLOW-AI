@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, memo } from 'react';
 import { Clock, MapPin, Tag, ArrowRight, CheckCircle2, User, Radio } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getSessionCountdown } from '../utils/sessionUtils';
@@ -123,4 +123,4 @@ const SessionCard = ({ session, isAlternate }) => {
   );
 };
 
-export default SessionCard;
+export default memo(SessionCard);

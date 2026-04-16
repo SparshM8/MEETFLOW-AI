@@ -8,8 +8,8 @@
   --bg-tertiary: #16182e;       /* Highest surfaces (cards etc) */
   
   --text-primary: #ffffff;
-  --text-secondary: #cbd5e1;    /* Brighter slate for better contrast */
-  --text-tertiary: #94a3b8;     /* Brighter slate for better contrast */
+  --text-secondary: #e2e8f0;    /* Darkened from #cbd5e1 for WCAG accessibility */
+  --text-tertiary: #a0aec0;     /* Darkened from #94a3b8 for WCAG accessibility */
   
   --accent-primary: #6366f1;    /* Corporate Indigo */
   --accent-primary-hover: #4f46e5;
@@ -77,11 +77,10 @@ a {
   text-decoration: none;
 }
 
-button {
-  cursor: pointer;
-  font-family: var(--font-sans);
-  border: none;
-  outline: none;
+button:focus-visible, 
+a:focus-visible {
+  outline: 2px solid var(--accent-primary);
+  outline-offset: 4px;
 }
 
 /* Utilities */

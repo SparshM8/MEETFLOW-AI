@@ -19,13 +19,13 @@ const Navigation = () => {
 
   return (
     <>
-      <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={close}></div>
+      <div className={`sidebar-backdrop ${isSidebarOpen ? 'active' : ''}`} onClick={close} aria-hidden="true"></div>
 
       <nav className={`side-nav ${isSidebarOpen ? 'open' : ''}`} role="navigation" aria-label="Main navigation">
         {/* Brand */}
         <div className="nav-brand">
           <div className="flex items-center gap-3">
-            <Sparkles className="brand-icon" size={24} />
+            <Sparkles className="brand-icon" size={24} aria-hidden="true" />
             <span className="brand-text gradient-text-accent">MeetFlow AI</span>
           </div>
           <button className="mobile-close-btn" onClick={close} aria-label="Close menu">
@@ -35,16 +35,16 @@ const Navigation = () => {
 
         {/* Links */}
         <div className="nav-links">
-          <NavLink to="/dashboard" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-            <LayoutDashboard size={19} />
+          <NavLink to="/dashboard" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} aria-label="Dashboard">
+            <LayoutDashboard size={19} aria-hidden="true" />
             <span>Dashboard</span>
           </NavLink>
-          <NavLink to="/explore" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-            <Compass size={19} />
+          <NavLink to="/explore" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} aria-label="Explore People">
+            <Compass size={19} aria-hidden="true" />
             <span>Explore People</span>
           </NavLink>
-          <NavLink to="/agenda" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
-            <CalendarDays size={19} />
+          <NavLink to="/agenda" onClick={close} className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')} aria-label="My Agenda">
+            <CalendarDays size={19} aria-hidden="true" />
             <span>My Agenda</span>
           </NavLink>
         </div>

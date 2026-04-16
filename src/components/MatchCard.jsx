@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, memo } from 'react';
 import {
   UserPlus, Sparkles, Handshake, Check, Send, Building2,
   ChevronDown, ChevronUp, Target, Zap, Clock, BookOpen, ThumbsUp, ThumbsDown
@@ -211,4 +211,4 @@ const MatchCard = ({ match }) => {
   );
 };
 
-export default MatchCard;
+export default memo(MatchCard);
