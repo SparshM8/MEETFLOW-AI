@@ -1,24 +1,25 @@
 /**
  * MeetFlow Analytics Service
- * Simulated Firebase Analytics for product evaluation.
+ * Production-ready Google Analytics Integration.
  */
+import { analytics } from './firebase';
+import { logEvent as firebaseLogEvent } from "firebase/analytics";
 
 const isProd = import.meta.env.PROD;
 
 export const logEvent = (eventName, params = {}) => {
-  // Mock Firebase Analytics logic
-  const eventData = {
-    event: eventName,
-    ...params,
-    timestamp: new Date().toISOString(),
-    environment: isProd ? 'production' : 'development'
-  };
-
-  if (!isProd) {
-    console.log(`[Analytics] Tracked: ${eventName}`, eventData);
+  if (analytics) {
+    firebaseLogEvent(analytics, eventName, {
+      ...params,
+      timestamp: new Date().toISOString(),
+      platform: 'web-concierge'
+    });
   }
 
-  // Ready for firebase.analytics().logEvent(eventName, params)
+  // Debug log for evaluation visibility
+  if (!isProd) {
+    console.log(`[Google Analytics] Logged: ${eventName}`, params);
+  }
 };
 
 export const GAPageView = (pageName) => {

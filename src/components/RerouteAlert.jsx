@@ -6,7 +6,11 @@ const RerouteAlert = ({ alertData, onAccept, onDismiss }) => {
   if (!alertData) return null;
 
   return (
-    <div className="reroute-overlay animate-fade-in">
+    <div 
+      className="reroute-overlay animate-fade-in"
+      role="alert"
+      aria-live="assertive"
+    >
       <div className="reroute-alert glass-panel animate-slide-down">
         <button className="close-btn" onClick={onDismiss}>
           <X size={20} />

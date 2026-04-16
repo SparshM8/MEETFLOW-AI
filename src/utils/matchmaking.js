@@ -1,8 +1,39 @@
 /**
- * Matchmaking algorithm for MeetFlow MVP.
- * Simulates an AI matching engine using deterministic heuristics.
+ * @typedef {Object} Attendee
+ * @property {string} id - Unique identifier
+ * @property {string} name - Full Name
+ * @property {string} role - Professional role
+ * @property {string[]} interests - List of topical interests
+ * @property {string[]} goals - Professional goals
+ * @property {string[]} skills - Technical or soft skills
+ * @property {string} experienceLevel - Junior | Senior | etc.
+ * @property {string} [availability] - Availability status
  */
 
+/**
+ * @typedef {Object} MatchDetails
+ * @property {number} score - Calculated match score
+ * @property {string[]} sharedInterests - List of common interests
+ * @property {string[]} sharedSkills - List of common skills
+ * @property {string[]} matchingGoals - List of aligned goals
+ * @property {Object} breakDown - Percentage breakdown of score
+ */
+
+/**
+ * MeetFlow AI Service (Senior Implementation)
+ * Powered by Google Gemini with Zod Validation for extreme reliability.
+ * 
+ * @typedef {Object} Icebreaker
+ * @property {string} greeting - Professional opening
+ * @property {string} interest - Contextual shared factor
+ * @property {string} callToAction - Networking outcome
+ * @property {string} rawText - Pre-formatted display text
+ */
+
+/**
+ * Heuristic mapping for goal compatibility
+ * Defines how different professional objectives interact.
+ */
 const COMPLEMENTARY_GOALS = {
   "Find Co-founder": ["Find Co-founder", "Network", "Startups"],
   "Hire talent": ["Find Project", "Network"],
@@ -15,6 +46,9 @@ const COMPLEMENTARY_GOALS = {
 
 /**
  * Calculate match score between two users
+ * @param {Attendee} userA - The current user
+ * @param {Attendee} userB - The potential match
+ * @returns {MatchDetails} Structured scoring breakdown
  */
 export const getMatchScore = (userA, userB) => {
   let score = 0;

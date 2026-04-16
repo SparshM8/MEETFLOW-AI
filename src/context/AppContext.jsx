@@ -3,7 +3,7 @@ import { sessions as initialSessions, attendees } from '../data/mockData';
 import { getRecommendedAgenda, getAlternativeSession, evaluateConflict } from '../utils/agenda';
 import { detectConflicts } from '../utils/sessionUtils';
 import { CheckCircle2, AlertTriangle, Info, X, Zap } from 'lucide-react';
-import { saveNoteToCloud } from '../services/firebase';
+import { saveNoteToCloud, syncUserCloudProfile } from '../services/firebase';
 import { trackRSVP, trackConnection, trackReroute } from '../services/analytics';
 import { generateRerouteReason } from '../services/aiService';
 
@@ -225,8 +225,15 @@ export const AppProvider = ({ children }) => {
           showToast(`⚡ Concierge Advice: Conflict detected. ${advisor.reason}`, 'info');
         }
 
-        setUserAgenda(prev => [...prev, session]);
+        const newAgenda = [...userAgenda, session];
+        setUserAgenda(newAgenda);
         trackRSVP(session.id, 'confirmed');
+        
+        // Cloud Sync
+        if (currentUser) {
+          syncUserCloudProfile(currentUser.id, { agendaCount: newAgenda.length, lastAction: 'rsvp' });
+        }
+        
         showToast(`RSVP confirmed: ${session.title}`, 'success');
       }
     }
@@ -249,12 +256,21 @@ export const AppProvider = ({ children }) => {
 
   const handleNetworkingState = (matchId, status) => {
     const existing = networkRoster.find(n => n.matchId === matchId);
+    let newRoster;
     if (existing) {
-      setNetworkRoster(prev => prev.map(n => n.matchId === matchId ? { ...n, status } : n));
+      newRoster = networkRoster.map(n => n.matchId === matchId ? { ...n, status } : n);
+      setNetworkRoster(newRoster);
     } else {
-      setNetworkRoster(prev => [...prev, { matchId, status }]);
+      newRoster = [...networkRoster, { matchId, status }];
+      setNetworkRoster(newRoster);
     }
     trackConnection(matchId, status);
+    
+    // Cloud Sync
+    if (currentUser) {
+      syncUserCloudProfile(currentUser.id, { networkCount: newRoster.length, lastAction: `network_${status}` });
+    }
+
     const msgMap = {
       requested: 'Intro request sent!',
       saved: 'Saved to your network roster',

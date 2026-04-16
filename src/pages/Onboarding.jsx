@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
+import { googleSignIn } from '../services/AuthService';
 import './Onboarding.css';
 
 const PRESET_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 'UX for AI', 'Predictive Modeling', 'Web3', 'SaaS'];
@@ -11,6 +12,8 @@ const PRESET_SKILLS = ['Python', 'React', 'TensorFlow', 'Product Strategy', 'Fig
 const Onboarding = () => {
   const navigate = useNavigate();
   const { completeOnboarding } = useContext(AppContext);
+  const [step, setStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -57,6 +60,21 @@ const Onboarding = () => {
     if (formData.skills.length > 0 || formData.interests.length > 0 || formData.goals.length > 0) return 2;
     if (formData.name && formData.role) return 1;
     return 0;
+  };
+
+  const handleNext = async () => {
+    if (step === 1) {
+      setIsLoading(true);
+      try {
+        const mockAuth = await googleSignIn();
+        setFormData(prev => ({ ...prev, name: mockAuth.displayName, email: mockAuth.email }));
+        setStep(2);
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setStep(step + 1);
+    }
   };
 
   const handleSubmit = (e) => {

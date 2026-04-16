@@ -5,6 +5,19 @@ import { z } from 'zod';
 /**
  * MeetFlow AI Service (Senior Implementation)
  * Powered by Google Gemini with Zod Validation for extreme reliability.
+ * 
+ * @typedef {Object} Icebreaker
+ * @property {string} greeting - Professional opening
+ * @property {string} interest - Contextual shared factor
+ * @property {string} callToAction - Networking outcome
+ * @property {string} rawText - Pre-formatted display text
+ */
+
+/**
+ * @typedef {Object} MeetingPrep
+ * @property {string[]} commonalities - Shared ground
+ * @property {string[]} discussionStarters - Conversational prompts
+ * @property {string} prepSummary - High-level context
  */
 
 // --- Schemas ---
@@ -57,8 +70,18 @@ const model = genAI.getGenerativeModel({
 });
 
 /**
- * Robust Generator Wrapper
- * Handles Mock state, Gemini Calls, Zod Validation, and deterministic Fallbacks.
+ * Robust Generator Wrapper (The Zod AI Pipeline)
+ * 
+ * This is the heart of MeetFlow's deterministic AI behavior.
+ * 1. Simulations: Uses Mock Mode if API_KEY is missing/mocked.
+ * 2. Execution: Calls Google Gemini 1.5 Flash.
+ * 3. Validation: Enforces Zod schemas on the raw JSON response.
+ * 4. Resiliency: Returns a safe fallback in case of parsing errors or safety blocks.
+ * 
+ * @param {string} prompt - Detailed context for the AI
+ * @param {z.ZodObject} schema - Validation rules
+ * @param {any} fallback - High-quality deterministic data
+ * @returns {Promise<any>} Validated JSON response
  */
 async function safeGenerate(prompt, schema, fallback) {
   try {
