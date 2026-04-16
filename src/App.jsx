@@ -1,6 +1,6 @@
 import React, { Suspense, lazy, useContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Menu } from 'lucide-react';
+import { Menu, Sparkles } from 'lucide-react';
 import { AppProvider, AppContext } from './context/AppContext';
 import Navigation from './components/Navigation';
 import RerouteAlert from './components/RerouteAlert';
