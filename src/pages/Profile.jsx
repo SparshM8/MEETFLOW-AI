@@ -77,7 +77,7 @@ const SelectionPills = ({ label, helper, max, values, presets, onChange }) => (
 const Profile = () => {
   const { 
     currentUser, updateUser, userAgenda, networkRoster, resetApp,
-    privacySettings, updatePrivacy, wipeAILearning
+    privacySettings, updatePrivacy, wipeAILearning, eventStats
   } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState(null);
@@ -151,6 +151,11 @@ const Profile = () => {
               <span className="badge-verified-pill">
                 <ShieldCheck size={11} /> Verified
               </span>
+              {eventStats?.isResilientMode && (
+                <span className="badge-resilience-pill animate-pulse">
+                  <Globe size={11} /> Hybrid Sync
+                </span>
+              )}
             </div>
             <p className="profile-headline">
               {currentUser.headline || `${currentUser.role || ''}${currentUser.company ? ` at ${currentUser.company}` : ''}`}

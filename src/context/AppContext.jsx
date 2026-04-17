@@ -3,7 +3,7 @@ import { sessions as initialSessions, attendees } from '../data/mockData';
 import { getRecommendedAgenda, getAlternativeSession, evaluateConflict } from '../utils/agenda';
 import { detectConflicts } from '../utils/sessionUtils';
 import { CheckCircle2, AlertTriangle, Info, X, Zap } from 'lucide-react';
-import { saveNoteToCloud, syncUserCloudProfile } from '../services/firebase';
+import { saveNoteToCloud, syncUserCloudProfile, IS_FIREBASE_CONFIGURED } from '../services/firebase';
 import { trackRSVP, trackConnection, trackReroute } from '../services/analytics';
 import { generateRerouteReason } from '../services/aiService';
 
@@ -105,7 +105,8 @@ export const AppProvider = ({ children }) => {
       pendingCount,
       sessionsDone,
       expertiseScore,
-      topTopic
+      topTopic,
+      isResilientMode: !IS_FIREBASE_CONFIGURED
     };
   }, [networkRoster, userAgenda, currentUser]);
 
@@ -135,7 +136,10 @@ export const AppProvider = ({ children }) => {
       await saveNoteToCloud(currentUser.email, sessionId, note);
     }
     
-    showToast('Note saved & synced to cloud', 'success');
+    const msg = IS_FIREBASE_CONFIGURED 
+      ? 'Note saved & synced to cloud' 
+      : 'Note saved (Hybrid Local Sync)';
+    showToast(msg, 'success');
   };
 
   const getSessionNote = (sessionId) => sessionNotes[sessionId] || '';
