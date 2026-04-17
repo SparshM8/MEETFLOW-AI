@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { googleSignIn } from '../services/AuthService';
+import { trackEvent, GA_EVENTS } from '../services/analytics';
 import './Onboarding.css';
 
 const PRESET_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 'UX for AI', 'Predictive Modeling', 'Web3', 'SaaS'];
@@ -89,6 +90,7 @@ const Onboarding = () => {
     };
 
     completeOnboarding(finalData);
+    trackEvent('onboarding_complete', { experience: finalData.experienceLevel });
     navigate('/dashboard');
   };
 

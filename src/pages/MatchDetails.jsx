@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, MessageSquare, Briefcase, Zap, Loader2 } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getMatchScore } from '../utils/matchmaking';
 import { generateIcebreaker, generateReasonToConnect } from '../services/aiService';
+import { trackEvent, GA_EVENTS } from '../services/analytics';
+import { Sparkles, ArrowLeft, MessageSquare, Briefcase, Zap, Loader2 } from 'lucide-react';
 import './MatchDetails.css';
 
 const MatchDetails = () => {
@@ -41,6 +42,9 @@ const MatchDetails = () => {
       setIcebreaker(genIcebreaker);
       setLoadingAI(false);
       setCopyState('idle');
+
+      // Track AI insight generation success
+      trackEvent(GA_EVENTS.MATCH_REASONING_VIEW, { match_id: id, score: match.score });
     };
 
     fetchAI();
@@ -54,6 +58,7 @@ const MatchDetails = () => {
     try {
       await navigator.clipboard.writeText(icebreaker);
       setCopyState('copied');
+      trackEvent(GA_EVENTS.ICEBREAKER_COPIED, { match_id: id });
       setTimeout(() => setCopyState('idle'), 1800);
     } catch {
       setCopyState('error');

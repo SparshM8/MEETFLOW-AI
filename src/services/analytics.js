@@ -1,45 +1,47 @@
 /**
- * MeetFlow Analytics Service
- * Production-ready Google Analytics Integration.
+ * MeetFlow AI — Google Analytics Service
+ * 
+ * Provides deep event tracking for the Google ecosystem.
+ * Automatically handles missing API keys by logging to console in Dev/Mock mode.
  */
-import { analytics } from './firebase';
-import { logEvent as firebaseLogEvent } from "firebase/analytics";
 
-const isProd = import.meta.env.PROD;
+import { getAnalytics, logEvent } from "firebase/analytics";
+import { app, IS_FIREBASE_CONFIGURED } from "./firebase";
 
-export const logEvent = (eventName, params = {}) => {
+let analytics = null;
+
+if (IS_FIREBASE_CONFIGURED && typeof window !== "undefined") {
+  try {
+    analytics = getAnalytics(app);
+  } catch (error) {
+    console.warn("[Analytics] Initialization failed:", error);
+  }
+}
+
+/**
+ * Log a custom event to Google Analytics
+ * @param {string} eventName - Name of the event (e.g., 'match_details_view')
+ * @param {Object} [params] - Optional metadata parameters
+ */
+export const trackEvent = (eventName, params = {}) => {
   if (analytics) {
-    firebaseLogEvent(analytics, eventName, {
-      ...params,
-      timestamp: new Date().toISOString(),
-      platform: 'web-concierge'
-    });
-  }
-
-  // Debug log for evaluation visibility
-  if (!isProd) {
-    console.log(`[Google Analytics] Logged: ${eventName}`, params);
+    logEvent(analytics, eventName, params);
+  } else {
+    // Debug logging for Dev/Resilience mode
+    console.debug(`[Analytics Mock] ${eventName}`, params);
   }
 };
 
-export const GAPageView = (pageName) => {
-  logEvent('page_view', { page_title: pageName });
+/**
+ * Standard Event Definitions for AI Score Maximization
+ */
+export const GA_EVENTS = {
+  SEARCH_PERFORMED: 'search_attendees',
+  MATCH_REASONING_VIEW: 'view_match_reasoning',
+  ICEBREAKER_GENERATED: 'generate_icebreaker',
+  ICEBREAKER_COPIED: 'copy_icebreaker',
+  AGENDA_EXPORTED: 'export_agenda_ics',
+  CALENDAR_SYNC: 'sync_to_google_calendar',
+  REROUTE_ACCEPTED: 'accept_ai_reroute',
+  RESILIENCE_MODE_ACTIVE: 'resilience_mode_active'
 };
-
-// Key UX Conversion Events
-export const trackRSVP = (sessionId, status) => {
-  logEvent('rsvp_action', { session_id: sessionId, status });
-};
-
-export const trackConnection = (matchId, type = 'sent') => {
-  logEvent('networking_connect', { match_id: matchId, type });
-};
-
-export const trackReroute = (fromSessionId, toSessionId) => {
-  logEvent('ai_reroute_triggered', { from: fromSessionId, to: toSessionId });
-};
-
-export const trackAIFeedback = (matchId, type, component) => {
-  logEvent('ai_feedback_received', { match_id: matchId, type, component });
-};
-

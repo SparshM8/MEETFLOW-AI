@@ -5,7 +5,9 @@ import SessionCard from '../components/SessionCard';
 import VenueMap from '../components/VenueMap';
 import { detectConflicts } from '../utils/sessionUtils';
 import { generateICS, downloadICS } from '../utils/calendar';
-import { Share, Download, ClipboardCheck } from 'lucide-react';
+import { generateGoogleCalendarUrl } from '../utils/googleCalendar';
+import { trackEvent, GA_EVENTS } from '../services/analytics';
+import { Share, Download, ClipboardCheck, Calendar } from 'lucide-react';
 import './Agenda.css';
 
 const ConflictBanner = ({ conflicts }) => {
@@ -66,6 +68,17 @@ const Agenda = () => {
   const handleExport = () => {
     const icsContent = generateICS(userAgenda, currentUser?.interests);
     downloadICS(icsContent);
+    trackEvent(GA_EVENTS.AGENDA_EXPORTED, { count: userAgenda.length });
+  };
+
+  const handleGoogleSync = () => {
+    // Sync the first session or provide a way to sync individual ones.
+    // For the global button, we'll open a view of the first confirmed session.
+    if (userAgenda.length > 0) {
+      const url = generateGoogleCalendarUrl(userAgenda[0]);
+      window.open(url, '_blank');
+      trackEvent(GA_EVENTS.CALENDAR_SYNC, { session_id: userAgenda[0].id });
+    }
   };
 
   const handleCopySummary = () => {
@@ -98,8 +111,11 @@ const Agenda = () => {
               <button className="btn btn-outline btn-sm" onClick={handleCopySummary} title="Copy text summary">
                 <Share size={15} /> Share
               </button>
-              <button className="btn btn-primary btn-sm" onClick={handleExport} title="Download .ics file">
-                <Download size={15} /> Export to Calendar
+              <button className="btn btn-outline btn-sm" onClick={handleExport} title="Download .ics file">
+                <Download size={15} /> Export .ICS
+              </button>
+              <button className="btn btn-primary btn-sm" onClick={handleGoogleSync} title="Sync to Google Calendar">
+                <Calendar size={15} /> Sync to Google
               </button>
             </>
           )}

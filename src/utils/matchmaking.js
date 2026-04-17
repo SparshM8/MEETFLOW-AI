@@ -5,17 +5,34 @@
  */
 
 /**
- * @typedef {Object} Signal
- * @property {string} type - interests | goals | skills | availability | experience
- * @property {string} icon - Lucide icon name
- * @property {string} label - Human-readable label
- * @property {string} value - Formatted value string
- * @property {string} strength - low | medium | high
+ * @typedef {Object} MatchBreakdown
+ * @property {number} interests - Percentage weight of interests overlap
+ * @property {number} skills - Percentage weight of skills overlap
+ * @property {number} goals - Percentage weight of goal compatibility
  */
 
 /**
- * Heuristic mapping for goal compatibility
+ * @typedef {Object} MatchDetails
+ * @property {number} score - Normalized compatibility score (0-100)
+ * @property {string[]} sharedInterests - Common interests between attendees
+ * @property {string[]} sharedSkills - Common skills between attendees
+ * @property {string[]} matchingGoals - Human-readable explanation of goal alignment
+ * @property {MatchBreakdown} breakDown - Quantitative breakdown of the score
+ */
+
+/**
+ * @typedef {Object} Signal
+ * @property {string} type - 'interests' | 'goals' | 'skills' | 'availability' | 'experience'
+ * @property {string} icon - Lucide-react icon name string
+ * @property {string} label - Human-readable label
+ * @property {string} value - Formatted value string
+ * @property {string} strength - 'low' | 'medium' | 'high'
+ */
+
+/**
+ * Heuristic mapping for goal compatibility.
  * Defines how different professional objectives interact to create networking value.
+ * @type {Object.<string, string[]>}
  */
 const COMPLEMENTARY_GOALS = {
   "Find Co-founder": ["Find Co-founder", "Network", "Startups"],
@@ -30,56 +47,63 @@ const COMPLEMENTARY_GOALS = {
 /**
  * Calculate multi-dimensional match score between two attendees.
  * 
- * @param {Attendee} userA - The person receiving recommendations
- * @param {Attendee} userB - The potential networking match
+ * Uses a weighted heuristic approach (Goals > Interests/Skills) to determine 
+ * networking compatibility for professional events.
+ * 
+ * @param {Object} userA - The person receiving recommendations
+ * @param {Object} userB - The potential networking match
  * @returns {MatchDetails} Structured breakdown of interests, skills, and goals compatibility
  */
 export const getMatchScore = (userA, userB) => {
+  // Defensive checks to prevent UI crashes on malformed data
+  if (!userA || !userB) return { score: 0, sharedInterests: [], sharedSkills: [], matchingGoals: [], breakDown: { interests: 0, skills: 0, goals: 0 } };
+
   let score = 0;
   let sharedInterests = [];
   let sharedSkills = [];
   let matchingGoals = [];
 
-  // Overlapping Interests (Primary similarity signal)
+  // 1. Overlapping Interests (Contextual Similarity)
   if (userA.interests && userB.interests) {
     sharedInterests = userA.interests.filter(i => userB.interests.includes(i));
     score += sharedInterests.length * 10;
   }
 
-  // Overlapping Skills (Capability alignment)
+  // 2. Overlapping Skills (Collaboration Capacity)
   if (userA.skills && userB.skills) {
     sharedSkills = userA.skills.filter(s => userB.skills.includes(s));
     score += sharedSkills.length * 10;
   }
 
-  // Complementary Goals (Outcome alignment)
-  // Higher weight than interests/skills because it drives specific actions.
+  // 3. Complementary Goals (Outcome Alignment)
+  // Higher weight (15 vs 10) because it reflects active intent vs static profiles.
   if (userA.goals && userB.goals) {
     userA.goals.forEach(goalA => {
       const targetGoals = COMPLEMENTARY_GOALS[goalA] || [];
       const matches = userB.goals.filter(goalB => targetGoals.includes(goalB) || goalA === goalB);
       if (matches.length > 0) {
         score += matches.length * 15;
-        // Logic to track alignment for UI explanation
         matchingGoals.push({ from: goalA, to: matches[0] });
       }
     });
 
-    // Deduplicate and format goals for UI display
-    matchingGoals = matchingGoals.map(mg => mg.from === mg.to ? mg.from : `${mg.from} <-> ${mg.to}`);
+    // Formatting for UI display
+    matchingGoals = matchingGoals.map(mg => mg.from === mg.to ? mg.from : `${mg.from} ↔ ${mg.to}`);
     matchingGoals = [...new Set(matchingGoals)];
   }
 
-  // Calculate normalized percentages for radar/pie charts (Total 100)
-  const totalRaw = score;
+  // Normalized Calculation (Caps total raw score at 100 for reliable UI bars)
+  const normalizedScore = Math.min(100, score);
+  
+  const totalRaw = score || 1; // Prevent division by zero
   const breakDown = {
-    interests: totalRaw > 0 ? Math.round(((sharedInterests.length * 10) / totalRaw) * 100) : 0,
-    skills: totalRaw > 0 ? Math.round(((sharedSkills.length * 10) / totalRaw) * 100) : 0,
-    goals: totalRaw > 0 ? Math.round((score - (sharedInterests.length * 10 + sharedSkills.length * 10)) / totalRaw * 100) : 0
+    interests: Math.round(((sharedInterests.length * 10) / totalRaw) * 100),
+    skills: Math.round(((sharedSkills.length * 10) / totalRaw) * 100),
+    goals: Math.round((Math.max(0, score - (sharedInterests.length * 10 + sharedSkills.length * 10))) / totalRaw * 100)
   };
 
   return {
-    score: score > 100 ? 100 : score, // Normalize roughly to 100 for display sanity
+    score: normalizedScore,
     sharedInterests,
     sharedSkills,
     matchingGoals,
@@ -90,20 +114,16 @@ export const getMatchScore = (userA, userB) => {
 /**
  * Filter and rank potential attendees to find the top N networking matches.
  * 
- * @param {Attendee} currentUser - The active user profile
- * @param {Attendee[]} attendeesList - Pool of potential connections
+ * @param {Object} currentUser - The active user profile
+ * @param {Object[]} attendeesList - Pool of potential connections
  * @param {number} [limit=5] - Maximum matches to return
- * @returns {Attendee[]} Ranked list of attendees with matchDetails injected
+ * @returns {Object[]} Ranked list of attendees with matchDetails injected
  */
 export const getTopMatches = (currentUser, attendeesList, limit = 5) => {
-  if (!currentUser || !currentUser.name) return attendeesList.slice(0, limit);
+  if (!currentUser || !currentUser.name || !attendeesList) return [];
 
   const scoredMatches = attendeesList
-    // Self-exclusion: compare by id if available, otherwise fall back to name
-    .filter(a => {
-      if (currentUser.id && a.id) return a.id !== currentUser.id;
-      return a.name !== currentUser.name;
-    })
+    .filter(a => (a.id && currentUser.id) ? (a.id !== currentUser.id) : (a.name !== currentUser.name))
     .map(attendee => {
       const details = getMatchScore(currentUser, attendee);
       return {
@@ -120,78 +140,65 @@ export const getTopMatches = (currentUser, attendeesList, limit = 5) => {
 
 /**
  * Explainability Layer: Generate a signal-based breakdown of why a match was proposed.
- * Used by UI to render 'Why this match' chips or sections.
  * 
- * @param {Attendee} currentUser - Static context
- * @param {Attendee} match - Match object with details from getMatchScore
+ * @param {Object} currentUser - Active user context
+ * @param {Object} match - Match object (with matchDetails)
  * @returns {Signal[]} Array of signal objects for visualization
  */
 export const generateMatchExplanation = (currentUser, match) => {
+  if (!currentUser || !match) return [];
+  
   const details = match.matchDetails || getMatchScore(currentUser, match);
   const signals = [];
 
-  // 1. Shared Interests Signal
+  // Shared Interests Signal
   if (details.sharedInterests?.length > 0) {
     signals.push({
       type: 'interests',
-      icon: 'sparkles',
+      icon: 'Sparkles',
       label: 'Shared Interests',
-      value: details.sharedInterests.join(', '),
+      value: details.sharedInterests.slice(0, 3).join(', '),
       strength: details.sharedInterests.length >= 2 ? 'high' : 'medium',
     });
   }
 
-  // 2. Goal Alignment Signal
+  // Goal Alignment Signal
   if (details.matchingGoals?.length > 0) {
     signals.push({
       type: 'goals',
-      icon: 'target',
+      icon: 'Target',
       label: 'Goal Alignment',
-      value: details.matchingGoals.join(' · '),
+      value: details.matchingGoals.slice(0, 2).join(' · '),
       strength: 'high',
     });
   }
 
-  // 3. Skill Overlap Signal
+  // Skill Overlap Signal
   if (details.sharedSkills?.length > 0) {
     signals.push({
       type: 'skills',
-      icon: 'zap',
+      icon: 'Zap',
       label: 'Skill Overlap',
-      value: details.sharedSkills.join(', '),
+      value: details.sharedSkills.slice(0, 3).join(', '),
       strength: 'medium',
     });
   }
 
-  // 4. Availability Context
-  if (
-    currentUser.availability &&
-    match.availability &&
-    match.availability !== 'Only Scheduled Meetings'
-  ) {
-    signals.push({
-      type: 'availability',
-      icon: 'clock',
-      label: 'Open to Connect',
-      value: match.availability,
-      strength: 'low',
-    });
-  }
-
-  // 5. Mentor-Mentee Potential (Experience pairing)
+  // Mentor-Mentee Context
   const levels = ['Junior', 'Mid-Level', 'Senior', 'Executive'];
-  const userIdx = levels.indexOf(currentUser.experienceLevel);
-  const matchIdx = levels.indexOf(match.experienceLevel);
-  if (userIdx !== -1 && matchIdx !== -1 && Math.abs(userIdx - matchIdx) === 1) {
+  const uIdx = levels.indexOf(currentUser.experienceLevel);
+  const mIdx = levels.indexOf(match.experienceLevel);
+  if (uIdx !== -1 && mIdx !== -1 && Math.abs(uIdx - mIdx) >= 1) {
     signals.push({
       type: 'experience',
-      icon: 'book',
-      label: 'Mentor–Mentee Potential',
-      value: `You're ${currentUser.experienceLevel}, they're ${match.experienceLevel}`,
+      icon: 'BookOpen',
+      label: 'Growth Potential',
+      value: `${currentUser.experienceLevel} ↔ ${match.experienceLevel}`,
       strength: 'medium',
     });
   }
 
   return signals;
 };
+
 

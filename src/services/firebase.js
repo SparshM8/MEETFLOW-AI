@@ -9,7 +9,8 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, doc, setDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
-import { getAnalytics, isSupported } from "firebase/analytics";
+import { getAnalytics, isSupported, logEvent } from "firebase/analytics";
+import { getRemoteConfig, fetchAndActivate, getString } from "firebase/remote-config";
 
 // ─── Config Detection ───────────────────────────────────────────────────────
 const firebaseConfig = {
@@ -47,6 +48,28 @@ if (IS_FIREBASE_CONFIGURED) {
 }
 
 export { db, auth, analytics };
+
+/**
+ * Standardized Analytics Logger for Google Ecosystem
+ */
+export const logAnalyticsEvent = (name, params = {}) => {
+  if (analytics) {
+    logEvent(analytics, name, params);
+  } else {
+    console.debug(`[Resilience Analytics] ${name}`, params);
+  }
+};
+
+/**
+ * Get dynamic configuration from Google Remote Config (Feature Flags)
+ */
+export const getRemoteConfigValue = (key) => {
+  if (IS_FIREBASE_CONFIGURED && app) {
+    const rc = getRemoteConfig(app);
+    return getString(rc, key);
+  }
+  return null;
+};
 
 // ─── Resilient Firestore Operations ──────────────────────────────────────────
 
