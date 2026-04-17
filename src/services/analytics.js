@@ -38,6 +38,8 @@ export const trackEvent = (eventName, params = {}) => {
 export const trackRSVP = (sessionId, status) => trackEvent('session_rsvp', { sessionId, status });
 export const trackConnection = (matchId, status) => trackEvent('connection_requested', { matchId, status });
 export const trackReroute = (fromSession, toSession) => trackEvent('ai_reroute_accepted', { from: fromSession, to: toSession });
+export const trackAIFeedback = (id, type, component) => trackEvent('ai_feedback', { id, type, component });
+
 
 
 /**

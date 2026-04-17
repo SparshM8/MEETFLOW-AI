@@ -1,3 +1,7 @@
+import React, { useContext, useEffect, useRef, useState } from 'react';
+import { AppContext } from '../context/AppContext';
+import { generateIcebreaker, generateReasonToConnect } from '../services/aiService';
+import { X, Sparkles, Loader2, RefreshCcw, Send, BookmarkPlus, UserPlus } from 'lucide-react';
 import SafeContent from './SafeContent';
 import './ConnectionModal.css';
 
