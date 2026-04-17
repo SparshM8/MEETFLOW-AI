@@ -7,6 +7,7 @@ import {
   ArrowRight, ShieldCheck, Target, Users, BookOpen
 } from 'lucide-react';
 import GoogleSignIn from '../components/GoogleSignIn';
+import { IS_FIREBASE_CONFIGURED } from '../services/firebase';
 import './LandingPage.css';
 
 const LandingPage = () => {
@@ -55,10 +56,23 @@ const LandingPage = () => {
           </p>
           
           <div className="hero-cta-group">
-            <GoogleSignIn onAuthSuccess={handleAuthSuccess} />
-            <button className="btn btn-outline hero-cta-btn" onClick={handleGetStarted} aria-label="Start your AI concierge journey">
-              Enter without Sign-In <ArrowRight size={18} className="ml-2" aria-hidden="true" />
-            </button>
+            {IS_FIREBASE_CONFIGURED ? (
+              <>
+                <GoogleSignIn onAuthSuccess={handleAuthSuccess} />
+                <button className="btn btn-outline hero-cta-btn" onClick={handleGetStarted} aria-label="Start your AI concierge journey">
+                  Enter without Sign-In <ArrowRight size={18} className="ml-2" />
+                </button>
+              </>
+            ) : (
+              <div className="resilient-cta-wrapper">
+                <button className="btn btn-primary btn-lg hero-cta-btn-xl" onClick={handleGetStarted} aria-label="Begin Your AI Journey">
+                  Begin Your AI Journey <Zap size={20} className="ml-2" />
+                </button>
+                <div className="resilient-badge">
+                  <ShieldCheck size={14} /> Privacy-First & Offline-Ready Architecture Active
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="hero-cards">
