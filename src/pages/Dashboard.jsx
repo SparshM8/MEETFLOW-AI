@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, CalendarDays, Zap, ArrowRight, Users, Brain, Target, Clock } from 'lucide-react';
+import { Sparkles, CalendarDays, Zap, ArrowRight, Users, Brain, Target, Clock, Globe } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getTopMatches } from '../utils/matchmaking';
 import MatchCard from '../components/MatchCard';
