@@ -47,7 +47,7 @@ if (IS_FIREBASE_CONFIGURED) {
   }
 }
 
-export { db, auth, analytics };
+export { app, db, auth, analytics };
 
 /**
  * Standardized Analytics Logger for Google Ecosystem

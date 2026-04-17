@@ -33,6 +33,14 @@ export const trackEvent = (eventName, params = {}) => {
 };
 
 /**
+ * Compatibility Wrappers for Internal Services
+ */
+export const trackRSVP = (sessionId, status) => trackEvent('session_rsvp', { sessionId, status });
+export const trackConnection = (matchId, status) => trackEvent('connection_requested', { matchId, status });
+export const trackReroute = (fromSession, toSession) => trackEvent('ai_reroute_accepted', { from: fromSession, to: toSession });
+
+
+/**
  * Standard Event Definitions for AI Score Maximization
  */
 export const GA_EVENTS = {
