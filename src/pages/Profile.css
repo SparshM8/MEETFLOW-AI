@@ -181,6 +181,8 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   flex-shrink: 0;
+}
+
 .profile-headline {
   font-size: 0.9rem;
   color: var(--text-secondary);
