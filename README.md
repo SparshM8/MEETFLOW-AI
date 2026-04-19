@@ -15,9 +15,17 @@
     <img src="https://img.shields.io/badge/Firebase-Analytics_%26_Remote_Config-orange?logo=firebase" alt="Firebase Hardened" />
     <img src="https://img.shields.io/badge/Google_Maps-Interactive_Embed-blue?logo=googlemaps" alt="Google Maps" />
     <img src="https://img.shields.io/badge/Architecture-Resilient_Hybrid-cyan?logo=cloud" alt="Resilient Architecture" />
-    <img src="https://img.shields.io/badge/Tests-62_passing-green?logo=vitest" alt="62 Tests Passing" />
+    <img src="https://img.shields.io/badge/Tests-66_passing-green?logo=vitest" alt="66 Tests Passing" />
   </p>
 </div>
+
+---
+
+## Final Release Status (April 2026)
+
+- Branch: `main`
+- Validation: `npm run lint`, `npm test` (66/66), `npm run build` all passing
+- Stability additions: runtime cloud/local mode indicators, resilient auth fallback, deterministic integration tests, improved modal accessibility labels
 
 ---
 
@@ -29,7 +37,7 @@
 | **Code Quality** | **Enterprise Architecture**: Decoupled service layers. Comprehensive JSDoc typing. Modular matchmaking utility with heuristic goal alignment. `safeLazy()` deploy recovery. | `matchmaking.js`, `App.jsx` |
 | **Security** | **Defense in Depth**: CSP in `index.html`. Firestore default-deny rules. Zod schema enforcement on AI output. DOMPurify sanitization. | `firestore.rules`, `aiService.js` |
 | **Efficiency** | **Zero-Waste Latency**: `React.lazy` route splitting. `React.memo` logic. Static Maps fallback for ultra-fast LCP (Largest Contentful Paint). | `VenueMap.jsx`, `App.jsx` |
-| **Testing** | **Production Reliability**: **62 passing tests** covering matchmaking, conflict agents, XSS prevention, and Zod schemas. | `src/test/core.test.js` |
+| **Testing** | **Production Reliability**: **66 passing tests** covering matchmaking, conflict agents, XSS prevention, and Zod schemas. | `src/test/core.test.js` |
 | **Accessibility** | **Inclusive Design**: Focus traps, `aria-live` regions, semantic HTML5 structure, skip links, and ARIA-compliant overlays. | `ReasoningChain.jsx`, `App.jsx` |
 
 ---
@@ -103,7 +111,7 @@ cp .env.example .env
 # Start development server
 npm run dev
 
-# Run full test suite (62 passing tests)
+# Run full test suite (66 passing tests)
 npm test
 ```
 
