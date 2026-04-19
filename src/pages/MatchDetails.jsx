@@ -3,14 +3,22 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { getMatchScore } from '../utils/matchmaking';
 import { generateIcebreaker, generateReasonToConnect } from '../services/aiService';
-import { trackEvent, GA_EVENTS } from '../services/analytics';
-import { Sparkles, ArrowLeft, MessageSquare, Briefcase, Zap, Loader2 } from 'lucide-react';
+import { useAnalytics } from '../hooks/useAnalytics';
+import { Sparkles, ArrowLeft, MessageSquare, Briefcase, Zap, Loader2, Target } from 'lucide-react';
+import ReasoningChain from '../components/ReasoningChain';
 import './MatchDetails.css';
 
+/**
+ * MatchDetails Page
+ * Provides deep-dive insights into an AI-driven attendee match.
+ * Features: Explainable AI (XAI) reasoning chain, personalized icebreakers,
+ * and multi-dimensional compatibility breakdown.
+ */
 const MatchDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { currentUser, attendees } = useContext(AppContext);
+  const { trackMatchView, logInteraction, GA_EVENTS } = useAnalytics();
   
   const [icebreaker, setIcebreaker] = useState('');
   const [reason, setReason] = useState('');
@@ -76,7 +84,7 @@ const MatchDetails = () => {
 
       <div className="profile-hero glass-panel">
         <div className="profile-header">
-          <div className="profile-avatar">
+          <div className="profile-avatar" aria-label={`Avatar for ${match.name}`}>
             <span>{match.name.charAt(0)}</span>
           </div>
           <div className="profile-title">
@@ -89,6 +97,10 @@ const MatchDetails = () => {
         </div>
         
         <p className="bio">{match.bio}</p>
+      </div>
+
+      <div className="mt-8">
+        <ReasoningChain match={match} currentUser={currentUser} />
       </div>
 
       <div className="ai-insights grid-cols-2 mt-8">

@@ -133,7 +133,7 @@ const Dashboard = () => {
             { icon: <CalendarDays size={16} />, num: userAgenda.length, label: 'RSVP\'d' },
             { icon: <Users size={16} />, num: connectedCount, label: 'Requests' },
           ].map(({ icon, num, label }) => (
-            <div key={label} className="stat-badge">
+            <div key={label} className="stat-badge" aria-label={`${num} ${label}`}>
               {icon}
               <div>
                 <div className="stat-num">{num}</div>
