@@ -1,37 +1,46 @@
 import React, { useState } from 'react';
 import { LogIn, CheckCircle2 } from 'lucide-react';
+import { googleSignIn } from '../services/AuthService';
 import './GoogleSignIn.css';
 
 /**
- * Google Sign-In Simulation Component
- * High-fidelity interaction to demonstrate Google Services integration.
+ * Google Sign-In Component
+ * Uses Firebase Auth popup with resilient fallback from AuthService.
  */
 const GoogleSignIn = ({ onAuthSuccess }) => {
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [authNotice, setAuthNotice] = useState('');
 
-  const handleSimulation = () => {
+  const handleSignIn = async () => {
     setIsAuthenticating(true);
-    // Mimic official Google Chrome multi-step auth delay
-    setTimeout(() => {
+    setAuthNotice('');
+    try {
+      const user = await googleSignIn();
       setIsAuthenticating(false);
       setIsSuccess(true);
+      if (user.provider === 'local-resilience') {
+        setAuthNotice('Google Auth is not fully configured yet. You are continuing in local resilience mode.');
+      }
       setTimeout(() => {
         onAuthSuccess({
-          id: 'google_user_123',
-          email: 'judge.hackathon@gmail.com',
-          name: 'Hackathon Judge',
-          provider: 'google.com'
+          id: user.uid,
+          email: user.email,
+          name: user.displayName,
+          provider: user.provider,
         });
       }, 1000);
-    }, 1500);
+    } catch (error) {
+      setIsAuthenticating(false);
+      setAuthNotice(error?.message || 'Sign-in failed. Please verify Firebase Authentication settings.');
+    }
   };
 
   return (
     <div className="google-auth-container">
       <button 
         className={`btn-google ${isAuthenticating ? 'loading' : ''} ${isSuccess ? 'success' : ''}`}
-        onClick={handleSimulation}
+        onClick={handleSignIn}
         disabled={isAuthenticating || isSuccess}
         aria-label="Sign in with Google"
       >
@@ -48,6 +57,7 @@ const GoogleSignIn = ({ onAuthSuccess }) => {
         <span>{isSuccess ? 'Authenticated' : isAuthenticating ? 'Signing in...' : 'Sign in with Google'}</span>
       </button>
       <p className="auth-helper">Powered by Google Cloud Firebase Identity</p>
+      {authNotice && <p className="auth-helper" role="status">{authNotice}</p>}
     </div>
   );
 };

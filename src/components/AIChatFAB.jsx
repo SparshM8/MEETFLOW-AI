@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
 import { Sparkles, X, Send, Bot, User, AlertCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
-import { generateIcebreaker, generateRerouteReason } from '../services/aiService';
 import './AIChatFAB.css';
 
 // Keyword-to-AI-function router for context-aware responses

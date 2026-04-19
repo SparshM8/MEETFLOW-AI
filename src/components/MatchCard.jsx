@@ -26,6 +26,8 @@ const SIGNAL_COLORS = {
 
 const MatchCard = ({ match }) => {
   const { networkRoster, setActiveConnectionMatch, currentUser, matchFeedback, handleMatchFeedback } = useContext(AppContext);
+  const [showWhy, setShowWhy] = useState(false);
+  const [showPrep, setShowPrep] = useState(false);
 
   if (!match) {
     return (
@@ -45,9 +47,6 @@ const MatchCard = ({ match }) => {
       </div>
     );
   }
-
-  const [showWhy, setShowWhy] = useState(false);
-  const [showPrep, setShowPrep] = useState(false);
 
   const existingConnection = networkRoster.find(n => n.matchId === match.id);
   const status = existingConnection ? existingConnection.status : null;

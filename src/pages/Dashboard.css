@@ -67,6 +67,23 @@
   min-width: 80px;
 }
 
+.stat-badge.runtime-stat {
+  min-width: 110px;
+}
+
+.stat-badge.runtime-stat.firebase {
+  color: var(--success);
+  border-color: rgba(16,185,129,0.25);
+  background: rgba(16,185,129,0.08);
+}
+
+.stat-badge.runtime-stat.local-fallback,
+.stat-badge.runtime-stat.unknown {
+  color: var(--warning);
+  border-color: rgba(245,158,11,0.25);
+  background: rgba(245,158,11,0.08);
+}
+
 .stat-num {
   font-size: 1.4rem;
   font-weight: 700;

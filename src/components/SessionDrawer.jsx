@@ -6,7 +6,7 @@ import PulseMetrics from './PulseMetrics';
 import './SessionDrawer.css';
 
 const SessionDrawer = ({ sessionId, onClose }) => {
-  const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser, getSessionNote, saveSessionNote } = useContext(AppContext);
+  const { sessions, userAgenda, waitlist, rsvpToSession, removeFromAgenda, currentUser, getSessionNote, saveSessionNote, sessionNoteMeta } = useContext(AppContext);
   const [showWhyPanel, setShowWhyPanel] = useState(false);
   const [noteDrafts, setNoteDrafts] = useState({});
   const drawerRef = useRef(null);
@@ -67,6 +67,13 @@ const SessionDrawer = ({ sessionId, onClose }) => {
   if (!session) return null;
 
   const noteText = noteDrafts[session.id] ?? getSessionNote(session.id);
+  const noteMeta = sessionNoteMeta?.[session.id];
+  const noteSyncLabel = noteMeta?.lastSynced ? new Date(noteMeta.lastSynced).toLocaleString() : null;
+  const noteSyncMode = noteMeta?.source === 'firebase'
+    ? 'Cloud Synced'
+    : noteMeta?.source === 'local-resilience'
+      ? 'Local Resilience'
+      : null;
 
   const isRSVPd = userAgenda.some(s => s.id === session.id);
   const isWaitlisted = waitlist.some(s => s.id === session.id);
@@ -169,9 +176,16 @@ const SessionDrawer = ({ sessionId, onClose }) => {
           )}
 
           <div className="drawer-section mt-6 mb-4">
-            <h4 className="flex items-center gap-2 text-sm text-secondary mb-2">
-              <NotebookPen size={14} /> Quick Notes
-            </h4>
+            <div className="flex items-center justify-between gap-2 mb-2">
+              <h4 className="flex items-center gap-2 text-sm text-secondary">
+                <NotebookPen size={14} /> Quick Notes
+              </h4>
+              {noteSyncMode && (
+                <span className={`note-sync-pill ${noteMeta?.source || ''}`}>
+                  {noteSyncMode}
+                </span>
+              )}
+            </div>
             <textarea
               className="notes-textarea"
               placeholder="Jot down anything about this session — questions to ask, key takeaways, action items…"
@@ -195,10 +209,14 @@ const SessionDrawer = ({ sessionId, onClose }) => {
               Save Note
             </button>
             {getSessionNote(session.id) && (
-              <p className="text-xs text-tertiary mt-1">
-                ✓ Note saved — persists across sessions.
-              </p>
+              <div className="text-xs text-tertiary mt-1 note-sync-meta">
+                <p>✓ Note saved — persists across sessions.</p>
+                {noteSyncLabel && <p>Last synced: {noteSyncLabel} {noteMeta?.source === 'local-resilience' ? '(local resilience)' : '(cloud)'}</p>}
+              </div>
             )}
+            <p className="note-sync-legend text-xs text-tertiary mt-2">
+              Cloud = Firebase sync. Local = stored in resilience mode when cloud auth is unavailable.
+            </p>
           </div>
 
           <div className="drawer-section mt-4 mb-20">

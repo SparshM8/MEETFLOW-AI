@@ -1,4 +1,7 @@
+import React, { useEffect, useState } from 'react';
+import { Loader2, Info, Target, MessageSquare } from 'lucide-react';
 import SafeContent from './SafeContent';
+import { generateMeetingPrep } from '../services/aiService';
 import './MeetingPrep.css';
 
 const MeetingPrep = ({ currentUser, partner }) => {

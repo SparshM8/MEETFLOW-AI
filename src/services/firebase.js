@@ -10,7 +10,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore, doc, setDoc, collection, getDocs, serverTimestamp } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getAnalytics, isSupported, logEvent } from "firebase/analytics";
-import { getRemoteConfig, fetchAndActivate, getString } from "firebase/remote-config";
+import { getRemoteConfig, getString } from "firebase/remote-config";
 
 // ─── Config Detection ───────────────────────────────────────────────────────
 const firebaseConfig = {

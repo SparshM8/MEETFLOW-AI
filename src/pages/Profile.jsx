@@ -115,6 +115,9 @@ const Profile = () => {
 
   const completion = calcCompletion();
   const connected = networkRoster.filter(n => n.status === 'requested' || n.status === 'connected').length;
+  const lastSyncedLabel = currentUser.lastSynced
+    ? new Date(currentUser.lastSynced).toLocaleString()
+    : (eventStats?.isResilientMode ? 'Local resilience cache active' : 'Waiting for first sync');
 
   // Mock skill levels based on order
   const skillLevels = [92, 78, 85];
@@ -173,6 +176,13 @@ const Profile = () => {
               {currentUser.availability && (
                 <span className="meta-chip availability-chip"><Clock size={12} /> {currentUser.availability}</span>
               )}
+              <span className="meta-chip sync-chip">
+                <RotateCcw size={12} /> Last synced: {lastSyncedLabel}
+              </span>
+            </div>
+            <div className="sync-legend" aria-label="Persistence mode legend">
+              <span className="sync-legend-item firebase">Cloud = Firebase</span>
+              <span className="sync-legend-item local">Local = Resilience Mode</span>
             </div>
           </div>
 

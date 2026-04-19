@@ -1,6 +1,6 @@
 /* d:\PROMPT\MEETFLOW-AI\src\pages\LandingPage.jsx */
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Sparkles, Zap, CalendarDays, Share2, 
@@ -12,6 +12,12 @@ import './LandingPage.css';
 
 const LandingPage = () => {
   const navigate = useNavigate();
+  const runtimeMode = useMemo(() => {
+    if (!IS_FIREBASE_CONFIGURED) return 'local-missing-config';
+    const isFallback = typeof window !== 'undefined'
+      && localStorage.getItem('meetflow_firebase_auth_unavailable') === '1';
+    return isFallback ? 'local-fallback' : 'firebase';
+  }, []);
 
   const handleAuthSuccess = (userData) => {
     // In a real app, this would be the Firebase callback
@@ -73,6 +79,12 @@ const LandingPage = () => {
                 </div>
               </div>
             )}
+          </div>
+
+          <div className={`runtime-mode-badge ${runtimeMode}`} role="status" aria-live="polite">
+            {runtimeMode === 'firebase' && <><ShieldCheck size={14} /> Mode: Firebase Cloud Auth Active</>}
+            {runtimeMode === 'local-fallback' && <><ShieldCheck size={14} /> Mode: Local Resilience (Firebase Auth Unavailable)</>}
+            {runtimeMode === 'local-missing-config' && <><ShieldCheck size={14} /> Mode: Local Resilience (Firebase Keys Missing)</>}
           </div>
 
           <div className="hero-cards">

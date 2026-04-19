@@ -6,6 +6,11 @@ import './Navigation.css';
 
 const Navigation = () => {
   const { currentUser, isSidebarOpen, setIsSidebarOpen, logOut } = useContext(AppContext);
+  const runtimeMode = currentUser?.authMode === 'firebase'
+    ? 'firebase'
+    : currentUser?.authMode === 'local-resilience' || currentUser?.authMode === 'fallback'
+      ? 'local-fallback'
+      : 'unknown';
 
   useEffect(() => {
     const handleResize = () => {
@@ -51,6 +56,12 @@ const Navigation = () => {
 
         {/* Footer / Profile */}
         <div className="nav-footer">
+          <div className={`nav-mode-pill ${runtimeMode}`} role="status" aria-live="polite">
+            {runtimeMode === 'firebase' && 'Firebase Auth Active'}
+            {runtimeMode === 'local-fallback' && 'Local Resilience Mode'}
+            {runtimeMode === 'unknown' && 'Mode Unset'}
+          </div>
+
           <NavLink to="/profile" onClick={close} className={({ isActive }) => 'nav-item user-profile' + (isActive ? ' active' : '')}>
             <div className="nav-avatar">
               {currentUser?.name ? currentUser.name.charAt(0).toUpperCase() : <UserRound size={16} />}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, Command, Users, Calendar, User, X, Sparkles, ArrowRight, Zap } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
@@ -10,44 +10,20 @@ import './CommandPalette.css';
  * Centralizes Navigation, People Search, and AI Actions.
  */
 const CommandPalette = ({ isOpen, onClose }) => {
-  const { attendees, sessions, currentUser } = useContext(AppContext);
+  const { attendees, sessions } = useContext(AppContext);
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
   const navigate = useNavigate();
 
-  // Reset and focus on open
+  // Focus on open
   useEffect(() => {
     if (isOpen) {
-      setQuery('');
-      setActiveIndex(0);
       setTimeout(() => inputRef.current?.focus(), 50);
     }
   }, [isOpen]);
 
-  // Handle keyboard navigation
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKeys = (e) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        setActiveIndex(prev => (prev < filteredResults.length - 1 ? prev + 1 : prev));
-      }
-      if (e.key === 'ArrowUp') {
-        e.preventDefault();
-        setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
-      }
-      if (e.key === 'Enter') {
-        const result = filteredResults[activeIndex];
-        if (result) handleSelect(result);
-      }
-    };
-    window.addEventListener('keydown', handleKeys);
-    return () => window.removeEventListener('keydown', handleKeys);
-  }, [isOpen, activeIndex, query]);
-
-  const results = [
+  const results = useMemo(() => [
     // Navigation
     { id: 'nav-dashboard', type: 'nav', label: 'Go to Dashboard', path: '/dashboard', icon: <Command size={16}/> },
     { id: 'nav-explore', type: 'nav', label: 'Explore People', path: '/explore', icon: <Users size={16}/> },
@@ -77,7 +53,7 @@ const CommandPalette = ({ isOpen, onClose }) => {
       path: `/agenda`,
       icon: <Calendar size={16}/>
     }))
-  ];
+  ], [attendees, sessions]);
 
   const filteredResults = query 
     ? results.filter(r => 
@@ -86,10 +62,32 @@ const CommandPalette = ({ isOpen, onClose }) => {
       )
     : results.slice(0, 8); // Default suggestions
 
-  const handleSelect = (item) => {
+  const handleSelect = useCallback((item) => {
     navigate(item.path);
     onClose();
-  };
+  }, [navigate, onClose]);
+
+  // Handle keyboard navigation
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeys = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        setActiveIndex(prev => (prev < filteredResults.length - 1 ? prev + 1 : prev));
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        setActiveIndex(prev => (prev > 0 ? prev - 1 : prev));
+      }
+      if (e.key === 'Enter') {
+        const result = filteredResults[activeIndex];
+        if (result) handleSelect(result);
+      }
+    };
+    window.addEventListener('keydown', handleKeys);
+    return () => window.removeEventListener('keydown', handleKeys);
+  }, [isOpen, activeIndex, filteredResults, handleSelect, onClose]);
 
   if (!isOpen) return null;
 
@@ -104,7 +102,10 @@ const CommandPalette = ({ isOpen, onClose }) => {
             type="text"
             placeholder="Type a command or search..."
             value={query}
-            onChange={e => setQuery(e.target.value)}
+            onChange={e => {
+              setQuery(e.target.value);
+              setActiveIndex(0);
+            }}
           />
           <div className="cp-esc-tag">ESC</div>
         </div>

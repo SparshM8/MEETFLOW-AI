@@ -19,38 +19,34 @@ const TRENDING_SESSIONS = [
   'Quantum Computing Keynote'
 ];
 
+const createFeedItem = (id) => {
+  const template = FEED_TEMPLATES[Math.floor(Math.random() * FEED_TEMPLATES.length)];
+  const name = NAMES[Math.floor(Math.random() * NAMES.length)];
+  const sessionName = TRENDING_SESSIONS[Math.floor(Math.random() * TRENDING_SESSIONS.length)];
+
+  let text = template.text;
+  if (template.type === 'session') text = `"${sessionName}" ${template.text}`;
+
+  return {
+    id,
+    ...template,
+    text,
+    timestamp: 'Just now',
+    name: template.type === 'amenity' ? 'Event Staff' : name
+  };
+};
+
 const EventFeed = () => {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(() => Array(3).fill(null).map((_, i) => createFeedItem(i)));
 
   useEffect(() => {
-    // Initial load
-    const initial = Array(3).fill(null).map((_, i) => createItem(i));
-    setItems(initial);
-
     // Interval to add new "Live" events
     const interval = setInterval(() => {
-      setItems(prev => [createItem(Date.now()), ...prev].slice(0, 5));
+      setItems(prev => [createFeedItem(Date.now()), ...prev].slice(0, 5));
     }, 8000);
 
     return () => clearInterval(interval);
   }, []);
-
-  function createItem(id) {
-    const template = FEED_TEMPLATES[Math.floor(Math.random() * FEED_TEMPLATES.length)];
-    const name = NAMES[Math.floor(Math.random() * NAMES.length)];
-    const sessionName = TRENDING_SESSIONS[Math.floor(Math.random() * TRENDING_SESSIONS.length)];
-    
-    let text = template.text;
-    if (template.type === 'session') text = `"${sessionName}" ${template.text}`;
-
-    return {
-      id,
-      ...template,
-      text,
-      timestamp: 'Just now',
-      name: template.type === 'amenity' ? 'Event Staff' : name
-    };
-  }
 
   return (
     <div className="event-feed card">

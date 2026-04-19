@@ -1,7 +1,5 @@
-const CACHE_NAME = 'meetflow-v2';
+const CACHE_NAME = 'meetflow-v3';
 const PRE_CACHE_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/favicon.svg',
   '/icons.svg'
@@ -30,13 +28,17 @@ self.addEventListener('activate', (event) => {
  */
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
+  const requestUrl = new URL(event.request.url);
+  if (requestUrl.protocol !== 'http:' && requestUrl.protocol !== 'https:') return;
 
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
         const fetchPromise = fetch(event.request).then((networkResponse) => {
-          // Clone and update cache with the new version
-          cache.put(event.request, networkResponse.clone());
+          // Cache only successful HTTP responses.
+          if (networkResponse && networkResponse.ok) {
+            cache.put(event.request, networkResponse.clone());
+          }
           return networkResponse;
         }).catch(() => {
           // Silent catch for network failures (offline)

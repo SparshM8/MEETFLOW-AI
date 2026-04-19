@@ -1,6 +1,6 @@
 import React, { useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Sparkles, CalendarDays, Zap, ArrowRight, Users, Brain, Target, Clock, Globe } from 'lucide-react';
+import { Sparkles, CalendarDays, Zap, ArrowRight, Users, Brain, Target, Clock, Globe, ShieldCheck } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import { getTopMatches } from '../utils/matchmaking';
 import MatchCard from '../components/MatchCard';
@@ -88,6 +88,13 @@ const AIBriefing = ({ currentUser, topMatches, topRecommended, userAgenda, netwo
 const Dashboard = () => {
   const { currentUser, attendees, userAgenda, recommendedAgenda, networkRoster, eventStats } = useContext(AppContext);
   const navigate = useNavigate();
+  const runtimeMode = currentUser?.authMode === 'firebase'
+    ? 'firebase'
+    : currentUser?.authMode === 'local-resilience' || currentUser?.authMode === 'fallback'
+      ? 'local-fallback'
+      : eventStats?.isResilientMode
+        ? 'local-fallback'
+        : 'unknown';
   const topMatches = useMemo(
     () => (currentUser ? getTopMatches(currentUser, attendees, 4) : []),
     [currentUser, attendees]
@@ -141,6 +148,13 @@ const Dashboard = () => {
               </div>
             </div>
           ))}
+          <div className={`stat-badge runtime-stat ${runtimeMode}`} aria-label={`Runtime mode: ${runtimeMode}`}>
+            <ShieldCheck size={16} />
+            <div>
+              <div className="stat-num">{runtimeMode === 'firebase' ? 'Cloud' : 'Local'}</div>
+              <div className="stat-label">{runtimeMode === 'firebase' ? 'Firebase' : 'Resilience'}</div>
+            </div>
+          </div>
         </div>
       </header>
 

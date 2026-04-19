@@ -176,6 +176,43 @@
 
 .notes-textarea::placeholder { color: var(--text-tertiary); }
 
+.note-sync-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.note-sync-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  border: 1px solid var(--glass-border-strong);
+  color: var(--text-tertiary);
+  background: rgba(255,255,255,0.03);
+  text-transform: uppercase;
+}
+
+.note-sync-pill.firebase {
+  color: var(--success);
+  border-color: rgba(16,185,129,0.25);
+  background: rgba(16,185,129,0.08);
+}
+
+.note-sync-pill.local-resilience {
+  color: var(--warning);
+  border-color: rgba(245,158,11,0.25);
+  background: rgba(245,158,11,0.08);
+}
+
+.note-sync-legend {
+  line-height: 1.4;
+}
+
 .mt-2 { margin-top: 0.5rem; }
 .mt-1 { margin-top: 0.25rem; }
 

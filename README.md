@@ -139,3 +139,15 @@ MeetFlow AI was architected from Day 1 to address the core friction points of mo
 
 MeetFlow AI demonstrates how structured data and LLM-ready heuristics can transform a static directory into an **agentic, adaptive experience** — built to sustain production-grade reliability on the Google developer ecosystem.
 
+---
+
+## ✅ Demo Proof Checklist
+
+Use this quick checklist during judging or screen recording:
+
+1. Google sign-in opens and either completes Firebase auth or cleanly falls back to local resilience mode.
+2. The landing page shows the current runtime mode badge so the auth state is obvious.
+3. Matchmaking generates an icebreaker and reasoning chain for a selected attendee.
+4. Agenda export and Google Calendar sync both work from the Agenda page.
+5. Service worker and cached shell do not block local development after refresh.
+

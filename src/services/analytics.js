@@ -11,11 +11,16 @@ import { app, IS_FIREBASE_CONFIGURED } from "./firebase";
 let analytics = null;
 
 if (IS_FIREBASE_CONFIGURED && typeof window !== "undefined") {
-  try {
-    analytics = getAnalytics(app);
-  } catch (error) {
-    console.warn("[Analytics] Initialization failed:", error);
-  }
+  import("firebase/analytics")
+    .then(({ isSupported }) => isSupported())
+    .then((supported) => {
+      if (supported) {
+        analytics = getAnalytics(app);
+      }
+    })
+    .catch((error) => {
+      console.warn("[Analytics] Initialization failed:", error);
+    });
 }
 
 /**

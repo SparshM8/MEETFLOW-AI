@@ -71,7 +71,7 @@ const ConnectionModal = ({ match, onClose }) => {
   };
 
   return (
-    <div className="connection-overlay animate-fade-in" onClick={onClose} aria-hidden="true">
+    <div className="connection-overlay animate-fade-in" onClick={onClose}>
       <div
         ref={modalRef}
         className="connection-modal card-elevated animate-slide-down modal-flex-container"
@@ -79,6 +79,7 @@ const ConnectionModal = ({ match, onClose }) => {
         role="dialog"
         aria-modal="true"
         aria-labelledby="connection-modal-title"
+        aria-describedby="connection-modal-description"
         tabIndex={-1}
       >
         <button type="button" className="close-btn" onClick={onClose} aria-label="Close connection modal"><X size={20}/></button>
@@ -97,7 +98,7 @@ const ConnectionModal = ({ match, onClose }) => {
         </div>
 
         <div className="modal-body flex-col gap-6 overflow-y-auto pr-2">
-          <div className="match-rationale">
+          <div className="match-rationale" id="connection-modal-description">
              <h4 className="flex items-center gap-2 text-primary mb-2"><Sparkles size={16} className="text-accent-secondary"/> AI Synergy Assessment</h4>
              {loading ? (
                <div className="text-secondary flex items-center gap-2"><Loader2 size={16} className="animate-spin"/> Analyzing...</div>
@@ -137,6 +138,8 @@ const ConnectionModal = ({ match, onClose }) => {
              </div>
              {loading ? <div className="h-10 border-dashed border-glass rounded flex-center text-secondary"><Loader2 size={16} className="animate-spin"/></div> : (
                <textarea 
+                 id="drafted-introduction"
+                 aria-label="Drafted introduction message"
                  className="w-full bg-base text-primary p-3 rounded border border-glass text-sm draft-textarea" 
                  rows="3" 
                  value={icebreaker}

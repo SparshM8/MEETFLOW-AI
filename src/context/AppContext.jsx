@@ -67,6 +67,7 @@ export const AppProvider = ({ children }) => {
   const [rerouteAlert, setRerouteAlert] = useState(null);
   const [networkRoster, setNetworkRoster] = useState(saved.networkRoster || []);
   const [sessionNotes, setSessionNotes] = useState(saved.sessionNotes || {}); // { sessionId: "note text" }
+  const [sessionNoteMeta, setSessionNoteMeta] = useState(saved.sessionNoteMeta || {}); // { sessionId: { lastSynced: string, source: string } }
   const [matchFeedback, setMatchFeedback] = useState(saved.matchFeedback || {}); // { matchId: 'positive' | 'negative' }
   const [privacySettings, setPrivacySettings] = useState(saved.privacySettings || {
     stealthMode: false,
@@ -112,8 +113,8 @@ export const AppProvider = ({ children }) => {
 
   /* ── Persistence: save on every relevant state change ── */
   useEffect(() => {
-    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback, privacySettings });
-  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes, matchFeedback, privacySettings]);
+    saveState({ currentUser, userAgenda, waitlist, networkRoster, sessionNotes, sessionNoteMeta, matchFeedback, privacySettings });
+  }, [currentUser, userAgenda, waitlist, networkRoster, sessionNotes, sessionNoteMeta, matchFeedback, privacySettings]);
 
   /* ── Toast helpers ── */
   const showToast = (message, type = 'success') => {
@@ -130,6 +131,13 @@ export const AppProvider = ({ children }) => {
   /* ── Notes ── */
   const saveSessionNote = async (sessionId, note) => {
     setSessionNotes(prev => ({ ...prev, [sessionId]: note }));
+    setSessionNoteMeta(prev => ({
+      ...prev,
+      [sessionId]: {
+        lastSynced: new Date().toISOString(),
+        source: IS_FIREBASE_CONFIGURED ? 'firebase' : 'local-resilience',
+      },
+    }));
     
     // Cloud Sync (Google Firebase Adoption)
     if (currentUser?.email) {
@@ -199,13 +207,13 @@ export const AppProvider = ({ children }) => {
 
   const completeOnboarding = (userData) => {
     setRerouteOverrides({});
-    setCurrentUser(userData);
+    setCurrentUser({ ...userData, lastSynced: new Date().toISOString() });
     showToast(`Welcome, ${userData.name.split(' ')[0]}! Your event plan is ready.`, 'success');
   };
 
   const updateUser = (newData) => {
     setRerouteOverrides({});
-    setCurrentUser(newData);
+    setCurrentUser({ ...newData, lastSynced: new Date().toISOString() });
     showToast('Profile updated successfully!', 'success');
   };
 
@@ -325,6 +333,7 @@ export const AppProvider = ({ children }) => {
       currentUser, attendees, sessions, recommendedAgenda, userAgenda, waitlist,
       rerouteAlert, networkRoster, toastMessage,
       sessionNotes, saveSessionNote, getSessionNote,
+      sessionNoteMeta,
       activeDrawerSession, setActiveDrawerSession,
       activeConnectionMatch, setActiveConnectionMatch,
       isSidebarOpen, setIsSidebarOpen,

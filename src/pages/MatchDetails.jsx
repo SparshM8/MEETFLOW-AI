@@ -52,21 +52,21 @@ const MatchDetails = () => {
       setCopyState('idle');
 
       // Track AI insight generation success
-      trackEvent(GA_EVENTS.MATCH_REASONING_VIEW, { match_id: id, score: match.score });
+      trackMatchView(id, match.score);
     };
 
     fetchAI();
     return () => {
       cancelled = true;
     };
-  }, [match, currentUser]);
+  }, [match, currentUser, id, trackMatchView]);
 
   const handleCopyIcebreaker = async () => {
     if (!icebreaker || copyState === 'copied') return;
     try {
       await navigator.clipboard.writeText(icebreaker);
       setCopyState('copied');
-      trackEvent(GA_EVENTS.ICEBREAKER_COPIED, { match_id: id });
+      logInteraction(GA_EVENTS.ICEBREAKER_COPIED, { match_id: id });
       setTimeout(() => setCopyState('idle'), 1800);
     } catch {
       setCopyState('error');

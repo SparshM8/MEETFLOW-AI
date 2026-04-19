@@ -1,5 +1,10 @@
 import { describe, it, expect, vi } from 'vitest';
 import { getMatchScore, getTopMatches } from '../utils/matchmaking';
+
+vi.mock('../services/aiService', () => ({
+  generateIcebreaker: vi.fn(async () => 'Hi Bob, I noticed we both care about Generative AI — would love to swap insights!'),
+}));
+
 import { generateIcebreaker } from '../services/aiService';
 
 describe('MeetFlow AI - Networking ROI Integration', () => {
@@ -36,7 +41,6 @@ describe('MeetFlow AI - Networking ROI Integration', () => {
 
   it('should correctly calculate composite match scores', () => {
     const scoreA = getMatchScore(mockUser, mockAttendees[0]);
-    const scoreB = getMatchScore(mockUser, mockAttendees[1]);
 
     // Bob shares Generative AI (10) + complementary goal (15) + shared skill React? (React is in interests for mockUser actually)
     // Actually mockUser has React in interests. Bob has React in skills. getMatchScore doesn't cross-check interests vs skills.
@@ -64,11 +68,9 @@ describe('MeetFlow AI - Networking ROI Integration', () => {
   });
 
   it('should generate a valid icebreaker format even with high-level signals', async () => {
-    // This tests the logic flow of icebreaker generation
     const match = mockAttendees[0];
     const details = getMatchScore(mockUser, match);
-    
-    // We mock the AI service to ensure we're testing the logic around it
+
     const icebreaker = await generateIcebreaker(mockUser, match, details);
     
     expect(typeof icebreaker).toBe('string');

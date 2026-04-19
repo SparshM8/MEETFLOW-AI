@@ -38,7 +38,7 @@ const ConflictBanner = ({ conflicts }) => {
 };
 
 const Agenda = () => {
-  const { userAgenda, recommendedAgenda, waitlist, simulateWaitlistPromotion } = useContext(AppContext);
+  const { userAgenda, recommendedAgenda, waitlist, simulateWaitlistPromotion, currentUser } = useContext(AppContext);
   const [filter, setFilter] = useState('All');
 
   const conflicts = useMemo(() => detectConflicts(userAgenda), [userAgenda]);
@@ -120,6 +120,12 @@ const Agenda = () => {
             </>
           )}
         </div>
+
+        {userAgenda.length > 0 && (
+          <p className="text-xs text-tertiary mt-2 agenda-sync-note">
+            Google sync opens a prefilled Calendar event, and .ICS export stays available as an offline fallback.
+          </p>
+        )}
 
         {/* Stats strip */}
         <div className="agenda-stats-strip">

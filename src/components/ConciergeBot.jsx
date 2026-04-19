@@ -3,17 +3,17 @@ import { Sparkles, X, ChevronRight, Zap, Target } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
 import './ConciergeBot.css';
 
+const TIPS = [
+  { icon: <Zap size={14} />, text: "Trending: 'GenAI Strategy' session just reached 90% capacity." },
+  { icon: <Target size={14} />, text: "Networking Tip: Mention your goal in 'Next-Gen Arch' to get 2x match signal." },
+  { icon: <Sparkles size={14} />, text: "Agent Insight: 3 people with 'React' skills just joined the lobby." },
+  { icon: <Zap size={14} />, text: 'Pro Tip: Export your agenda to avoid Wi-Fi issues during keynotes.' }
+];
+
 const ConciergeBot = () => {
-  const { userAgenda, networkRoster, eventStats } = useContext(AppContext);
+  const { userAgenda, eventStats } = useContext(AppContext);
   const [isOpen, setIsOpen] = useState(false);
   const [tip, setTip] = useState(null);
-
-  const TIPS = [
-    { icon: <Zap size={14} />, text: "Trending: 'GenAI Strategy' session just reached 90% capacity." },
-    { icon: <Target size={14} />, text: "Networking Tip: Mention your goal in 'Next-Gen Arch' to get 2x match signal." },
-    { icon: <Sparkles size={14} />, text: "Agent Insight: 3 people with 'React' skills just joined the lobby." },
-    { icon: <Zap size={14} />, text: "Pro Tip: Export your agenda to avoid Wi-Fi issues during keynotes." }
-  ];
 
   useEffect(() => {
     // Show a tip every 20 seconds

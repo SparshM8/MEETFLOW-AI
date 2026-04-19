@@ -1,9 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Sparkles, ArrowRight, CheckCircle2, AlertCircle } from 'lucide-react';
 import { AppContext } from '../context/AppContext';
-import { googleSignIn } from '../services/AuthService';
-import { trackEvent, GA_EVENTS } from '../services/analytics';
+import { trackEvent } from '../services/analytics';
 import './Onboarding.css';
 
 const PRESET_INTERESTS = ['Generative AI', 'Open Source', 'Ethics', 'Startups', 'UX for AI', 'Predictive Modeling', 'Web3', 'SaaS'];
@@ -12,9 +11,8 @@ const PRESET_SKILLS = ['Python', 'React', 'TensorFlow', 'Product Strategy', 'Fig
 
 const Onboarding = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { completeOnboarding } = useContext(AppContext);
-  const [step, setStep] = useState(1);
-  const [isLoading, setIsLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -63,30 +61,17 @@ const Onboarding = () => {
     return 0;
   };
 
-  const handleNext = async () => {
-    if (step === 1) {
-      setIsLoading(true);
-      try {
-        const mockAuth = await googleSignIn();
-        setFormData(prev => ({ ...prev, name: mockAuth.displayName, email: mockAuth.email }));
-        setStep(2);
-      } finally {
-        setIsLoading(false);
-      }
-    } else {
-      setStep(step + 1);
-    }
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
     
     // Auto generate mocked email and linkedin based on name
+    const googleUser = location.state?.googleUser;
     const finalData = {
       ...formData,
-      email: `${formData.name.toLowerCase().replace(' ', '.')}@example.com`,
-      linkedin: `linkedin.com/in/${formData.name.toLowerCase().replace(' ', '')}`
+      email: googleUser?.email || `${formData.name.toLowerCase().replace(' ', '.')}@example.com`,
+      linkedin: `linkedin.com/in/${formData.name.toLowerCase().replace(' ', '')}`,
+      authMode: googleUser?.authMode || googleUser?.provider || 'manual',
     };
 
     completeOnboarding(finalData);

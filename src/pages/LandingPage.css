@@ -197,6 +197,33 @@
   letter-spacing: 0.02em;
 }
 
+.runtime-mode-badge {
+  margin: 1.25rem auto 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--glass-border-strong);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+}
+
+.runtime-mode-badge.firebase {
+  color: var(--success);
+  border-color: rgba(16, 185, 129, 0.35);
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.runtime-mode-badge.local-fallback,
+.runtime-mode-badge.local-missing-config {
+  color: var(--warning);
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.1);
+}
+
 .hero-cards {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

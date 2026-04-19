@@ -12,19 +12,17 @@ import './SafeContent.css';
  * @param {string} [props.className] - Optional styling class
  * @param {string} [props.tag='div'] - The wrapper element tag
  */
-const SafeContent = ({ content, className = '', tag: Tag = 'div' }) => {
+const SafeContent = ({ content, className = '', tag = 'div' }) => {
   // Configured to allow basic formatting tags used by Gemini
   const sanitized = DOMPurify.sanitize(content || '', {
     ALLOWED_TAGS: ['b', 'strong', 'i', 'em', 'u', 'br', 'span'],
     ALLOWED_ATTR: ['class', 'style'],
   });
 
-  return (
-    <Tag 
-      className={`safe-content-wrapper ${className}`}
-      dangerouslySetInnerHTML={{ __html: sanitized }}
-    />
-  );
+  return React.createElement(tag, {
+    className: `safe-content-wrapper ${className}`,
+    dangerouslySetInnerHTML: { __html: sanitized },
+  });
 };
 
 export default SafeContent;

@@ -11,7 +11,7 @@
  * Run: npm test
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { getMatchScore, getTopMatches, generateMatchExplanation } from '../utils/matchmaking';
 import { detectConflicts, parseSessionTime } from '../utils/sessionUtils';
 import { sanitizeOutput, IcebreakerSchema, MeetingPrepSchema, RerouteReasonSchema, PulseSchema } from '../services/aiService';

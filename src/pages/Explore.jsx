@@ -167,7 +167,7 @@ const Explore = () => {
     }
 
     return list;
-  }, [enriched, query, activeSkill, activeInterest, activeExp, activeAvail, sortBy]);
+  }, [enriched, query, activeSkill, activeInterest, activeExp, activeAvail, activeRole, activeCompany, sortBy]);
 
   return (
     <div className="explore-page animate-fade-in">
